@@ -8,14 +8,17 @@ export const loginUser = async (email, password) => {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, password }),
     });
-    if (!response.ok) throw new Error('Login failed');
-    return await response.json();
+    const data = await response.json();
+    if (!response.ok) {
+      console.error('Server error response:', data);
+      throw new Error(data.message || 'Login failed');
+    }
+    return data;
   } catch (error) {
     console.error('Login error:', error);
     throw error;
   }
 };
-
 export const registerUser = async (userData) => {
   try {
     const response = await fetch(`${API_URL}/api/auth/register`, {
