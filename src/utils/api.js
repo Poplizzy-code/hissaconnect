@@ -23,8 +23,12 @@ export const registerUser = async (userData) => {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(userData),
     });
-    if (!response.ok) throw new Error('Registration failed');
-    return await response.json();
+    const data = await response.json();
+    if (!response.ok) {
+      console.error('Server error response:', data);
+      throw new Error(data.message || 'Registration failed');
+    }
+    return data;
   } catch (error) {
     console.error('Registration error:', error);
     throw error;
