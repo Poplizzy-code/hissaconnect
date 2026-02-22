@@ -447,7 +447,7 @@ const HomePage = ({ onStartLearning, onExploreCourses, onOpenCommunity, isAuthen
             {/* Free Plan */}
             <div className="bg-white rounded-lg shadow-md p-8">
               <h3 className="text-2xl font-bold text-gray-900 mb-6">Free</h3>
-              <p className="text-4xl font-bold text-gray-900 mb-6">$0<span className="text-lg text-gray-600">/month</span></p>
+              <p className="text-4xl font-bold text-gray-900 mb-6">N0<span className="text-lg text-gray-600">/month</span></p>
               
               <ul className="space-y-3 mb-8">
                 <li className="flex items-center space-x-2">
@@ -484,7 +484,7 @@ const HomePage = ({ onStartLearning, onExploreCourses, onOpenCommunity, isAuthen
               </div>
 
               <h3 className="text-2xl font-bold mb-6">Pro</h3>
-              <p className="text-4xl font-bold mb-6">$9.99<span className="text-lg">/month</span></p>
+              <p className="text-4xl font-bold mb-6">N1000<span className="text-lg">/month</span></p>
               
               <ul className="space-y-3 mb-8">
                 <li className="flex items-center space-x-2">
@@ -517,7 +517,7 @@ const HomePage = ({ onStartLearning, onExploreCourses, onOpenCommunity, isAuthen
             {/* Plus Plan */}
             <div className="bg-white rounded-lg shadow-md p-8">
               <h3 className="text-2xl font-bold text-gray-900 mb-6">Plus</h3>
-              <p className="text-4xl font-bold text-gray-900 mb-6">$19.99<span className="text-lg text-gray-600">/month</span></p>
+              <p className="text-4xl font-bold text-gray-900 mb-6">N3000<span className="text-lg text-gray-600">/month</span></p>
               
               <ul className="space-y-3 mb-8">
                 <li className="flex items-center space-x-2">

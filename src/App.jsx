@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate, useNavigate } from "react-router-dom";
 
 import Navbar from "./components/navbar";
 import Footer from "./components/footer";
@@ -34,6 +34,7 @@ function App() {
     setUser(userData);
     setIsAuthenticated(true);
     setShowLogin(false);
+    setShowRegister(false);
   };
 
   const handleLogout = () => {
@@ -44,13 +45,17 @@ function App() {
   };
 
   const handleStartLearning = () => {
-    if (!isAuthenticated) {
+    if (isAuthenticated) {
+      window.location.href = "/dashboard";
+    } else {
       setShowRegister(true);
     }
   };
 
   const handleExploreCourses = () => {
-    if (!isAuthenticated) {
+    if (isAuthenticated) {
+      window.location.href = "/resources";
+    } else {
       setShowLogin(true);
     }
   };
@@ -81,18 +86,8 @@ function App() {
               onClick={() => setShowLogin(false)}
               className="absolute -top-10 right-0 text-white hover:text-gray-300"
             >
-              <svg
-                className="w-8 h-8"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M6 18L18 6M6 6l12 12"
-                />
+              <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
             <LoginPage onLogin={handleLogin} />
@@ -108,18 +103,8 @@ function App() {
               onClick={() => setShowRegister(false)}
               className="absolute -top-10 right-0 text-white hover:text-gray-300"
             >
-              <svg
-                className="w-8 h-8"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M6 18L18 6M6 6l12 12"
-                />
+              <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
             <RegisterPage onLogin={handleLogin} />
@@ -127,7 +112,7 @@ function App() {
         </div>
       )}
 
-      {/* Community Forum Modal */}
+      {/* Community Modal */}
       {showCommunity && (
         <div className="fixed inset-0 bg-black bg-opacity-50 z-40 flex items-center justify-center">
           <div className="fixed inset-0 bg-white z-40">
@@ -135,18 +120,8 @@ function App() {
               onClick={() => setShowCommunity(false)}
               className="absolute top-6 right-6 z-50 p-2 bg-red-900 text-white hover:bg-red-800 rounded-full transition"
             >
-              <svg
-                className="w-6 h-6"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M6 18L18 6M6 6l12 12"
-                />
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
             <CommunityForumPage user={user} />
@@ -170,33 +145,21 @@ function App() {
 
           {isAuthenticated ? (
             <>
-              {user && user.role === "admin" && (
-                <Route
-                  path="/admin-dashboard"
-                  element={<AdminDashboard user={user} />}
-                />
+              {user?.role === "admin" && (
+                <Route path="/admin-dashboard" element={<AdminDashboard user={user} />} />
               )}
-
-              <Route
-                path="/dashboard"
-                element={<DashboardPage user={user} />}
-              />
+              <Route path="/admin" element={<AdminDashboard user={user} />} />
+              <Route path="/dashboard" element={<DashboardPage user={user} />} />
               <Route path="/resources" element={<AcademicResourcesPage />} />
+              <Route path="/community" element={<CommunityForumPage user={user} />} />
             </>
           ) : (
             <>
-              <Route
-                path="/login"
-                element={<LoginPage onLogin={handleLogin} />}
-              />
-              <Route
-                path="/register"
-                element={<RegisterPage onLogin={handleLogin} />}
-              />
+              <Route path="/login" element={<LoginPage onLogin={handleLogin} />} />
+              <Route path="/register" element={<RegisterPage onLogin={handleLogin} />} />
             </>
           )}
 
-          {/* Fallback */}
           <Route path="*" element={<Navigate to="/" />} />
         </Routes>
       </main>
