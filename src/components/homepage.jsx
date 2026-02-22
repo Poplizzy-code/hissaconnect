@@ -4,33 +4,54 @@ import axios from 'axios';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
+const categoryColors = {
+  scholarships: 'green',
+  conferences: 'blue',
+  internships: 'purple',
+  'research-grants': 'pink',
+  volunteering: 'yellow',
+  careers: 'red',
+};
+
+const categoryLabels = {
+  scholarships: 'SCHOLARSHIPS',
+  conferences: 'CONFERENCES',
+  internships: 'INTERNSHIPS',
+  'research-grants': 'RESEARCH GRANTS',
+  volunteering: 'VOLUNTEERING',
+  careers: 'CAREERS',
+};
+
 const HomePage = ({ onStartLearning, onExploreCourses, onOpenCommunity, isAuthenticated }) => {
   const [recentResources, setRecentResources] = useState([]);
-  const [selectedResource, setSelectedResource] = useState(null);
+  const [researchItems, setResearchItems] = useState([]);
 
   useEffect(() => {
-    const fetchRecentResources = async () => {
+    const fetchData = async () => {
       try {
         const token = localStorage.getItem('token');
-        const response = await axios.get(`${API_URL}/api/resources`, {
-          headers: token ? { Authorization: `Bearer ${token}` } : {},
-        });
-        if (response.data.success) {
-          setRecentResources(response.data.data.slice(0, 3));
+        const headers = token ? { Authorization: `Bearer ${token}` } : {};
+
+        const [resourcesRes, researchRes] = await Promise.all([
+          axios.get(`${API_URL}/api/resources`, { headers }),
+          axios.get(`${API_URL}/api/admin/research`),
+        ]);
+
+        if (resourcesRes.data.success) {
+          setRecentResources(resourcesRes.data.data.slice(0, 3));
+        }
+        if (researchRes.data.success) {
+          setResearchItems(researchRes.data.data.slice(0, 6));
         }
       } catch (err) {
-        setRecentResources([]);
+        console.error(err);
       }
     };
-    fetchRecentResources();
+    fetchData();
   }, []);
 
   const getBgColor = (index) => {
-    const colors = [
-      'from-amber-100 to-amber-200',
-      'from-blue-100 to-blue-200',
-      'from-purple-100 to-purple-200',
-    ];
+    const colors = ['from-amber-100 to-amber-200', 'from-blue-100 to-blue-200', 'from-purple-100 to-purple-200'];
     return colors[index % colors.length];
   };
 
@@ -54,20 +75,16 @@ const HomePage = ({ onStartLearning, onExploreCourses, onOpenCommunity, isAuthen
                 Join thousands of History & International Studies students excelling with HISSA Connect. Access verified resources, collaborate with peers, and achieve your academic goals.
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
-                <button onClick={onStartLearning}
-                  className="px-8 py-3 bg-white text-red-900 font-bold rounded hover:bg-red-50 transition text-center">
+                <button onClick={onStartLearning} className="px-8 py-3 bg-white text-red-900 font-bold rounded hover:bg-red-50 transition text-center">
                   Start Learning For Free
                 </button>
-                <button onClick={onExploreCourses}
-                  className="px-8 py-3 border-2 border-white text-white font-bold rounded hover:bg-red-800 transition text-center">
+                <button onClick={onExploreCourses} className="px-8 py-3 border-2 border-white text-white font-bold rounded hover:bg-red-800 transition text-center">
                   Explore Courses
                 </button>
               </div>
             </div>
             <div className="hidden md:flex justify-center">
-              <div className="w-96 h-96 bg-red-800 rounded-lg flex items-center justify-center text-6xl">
-                📚
-              </div>
+              <div className="w-96 h-96 bg-red-800 rounded-lg flex items-center justify-center text-6xl">📚</div>
             </div>
           </div>
         </div>
@@ -81,21 +98,17 @@ const HomePage = ({ onStartLearning, onExploreCourses, onOpenCommunity, isAuthen
             <p className="text-xl text-gray-600">Comprehensive tools to support your academic journey</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="bg-white rounded-lg shadow-md p-8 hover:shadow-lg transition">
-              <div className="w-16 h-16 bg-red-900 text-white rounded-lg flex items-center justify-center text-3xl mb-4">📖</div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-4">Lecture Resources</h3>
-              <p className="text-gray-600">Access organized lecture notes, verified by instructors, and supplementary materials for every course.</p>
-            </div>
-            <div className="bg-white rounded-lg shadow-md p-8 hover:shadow-lg transition">
-              <div className="w-16 h-16 bg-red-900 text-white rounded-lg flex items-center justify-center text-3xl mb-4">✍️</div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-4">Writing Tools</h3>
-              <p className="text-gray-600">Essay templates, citation guides, and model answers to help you excel in your assignments and exams.</p>
-            </div>
-            <div className="bg-white rounded-lg shadow-md p-8 hover:shadow-lg transition">
-              <div className="w-16 h-16 bg-red-900 text-white rounded-lg flex items-center justify-center text-3xl mb-4">💬</div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-4">Community Forum</h3>
-              <p className="text-gray-600">Connect with peers, ask questions, share insights, and learn from discussions with fellow students.</p>
-            </div>
+            {[
+              { icon: '📖', title: 'Lecture Resources', desc: 'Access organized lecture notes, verified by instructors, and supplementary materials for every course.' },
+              { icon: '✍️', title: 'Writing Tools', desc: 'Essay templates, citation guides, and model answers to help you excel in your assignments and exams.' },
+              { icon: '💬', title: 'Community Forum', desc: 'Connect with peers, ask questions, share insights, and learn from discussions with fellow students.' },
+            ].map(item => (
+              <div key={item.title} className="bg-white rounded-lg shadow-md p-8 hover:shadow-lg transition">
+                <div className="w-16 h-16 bg-red-900 text-white rounded-lg flex items-center justify-center text-3xl mb-4">{item.icon}</div>
+                <h3 className="text-2xl font-bold text-gray-900 mb-4">{item.title}</h3>
+                <p className="text-gray-600">{item.desc}</p>
+              </div>
+            ))}
           </div>
         </div>
       </section>
@@ -109,7 +122,7 @@ const HomePage = ({ onStartLearning, onExploreCourses, onOpenCommunity, isAuthen
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {[
-              { num: 1, title: 'Sign Up & Choose Courses', desc: 'Create your free account and enroll in the courses you\'re taking this semester.' },
+              { num: 1, title: 'Sign Up & Choose Courses', desc: "Create your free account and enroll in the courses you're taking this semester." },
               { num: 2, title: 'Access Resources & Tools', desc: 'Browse lecture notes, past questions, writing templates, and study materials for each course.' },
               { num: 3, title: 'Excel in Your Studies', desc: 'Learn from peers, ask questions in forums, and achieve your academic goals with confidence.' },
             ].map(step => (
@@ -123,16 +136,13 @@ const HomePage = ({ onStartLearning, onExploreCourses, onOpenCommunity, isAuthen
         </div>
       </section>
 
-      {/* Academic Resources — REAL DATA */}
+      {/* Academic Resources */}
       <section className="py-20 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center mb-12">
             <h2 className="text-4xl font-bold text-gray-900">Academic Resources</h2>
-            <Link to="/resources" className="text-red-900 font-semibold hover:underline">
-              View All Courses →
-            </Link>
+            <Link to="/resources" className="text-red-900 font-semibold hover:underline">View All Courses →</Link>
           </div>
-
           {recentResources.length === 0 ? (
             <div className="bg-white rounded-lg shadow-md p-12 text-center text-gray-400">
               <p className="text-5xl mb-4">📭</p>
@@ -147,17 +157,11 @@ const HomePage = ({ onStartLearning, onExploreCourses, onOpenCommunity, isAuthen
                     {getIcon(resource.fileType)}
                   </div>
                   <div className="p-6">
-                    <span className="text-sm font-semibold text-red-900 bg-red-100 px-3 py-1 rounded uppercase">
-                      {resource.section}
-                    </span>
+                    <span className="text-sm font-semibold text-red-900 bg-red-100 px-3 py-1 rounded uppercase">{resource.section}</span>
                     <h3 className="text-xl font-bold text-gray-900 mt-3 mb-2">{resource.title}</h3>
                     <p className="text-gray-600 text-sm mb-4 line-clamp-2">{resource.description}</p>
-                    <a
-                      href={resource.fileUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="w-full py-2 bg-red-900 text-white font-semibold rounded hover:bg-red-800 transition block text-center"
-                    >
+                    <a href={resource.fileUrl} target="_blank" rel="noopener noreferrer"
+                      className="w-full py-2 bg-red-900 text-white font-semibold rounded hover:bg-red-800 transition block text-center">
                       Access Resource
                     </a>
                   </div>
@@ -208,7 +212,7 @@ const HomePage = ({ onStartLearning, onExploreCourses, onOpenCommunity, isAuthen
         </div>
       </section>
 
-      {/* Community Forum Preview */}
+      {/* Community Forum */}
       <section className="py-20 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-4xl font-bold text-gray-900 mb-12">Community Forum</h2>
@@ -216,35 +220,42 @@ const HomePage = ({ onStartLearning, onExploreCourses, onOpenCommunity, isAuthen
             <p className="text-5xl mb-4">💬</p>
             <p className="text-lg font-semibold text-gray-700">Join the conversation</p>
             <p className="text-sm mt-2 mb-6">Connect with fellow History & International Studies students</p>
-            <button onClick={onOpenCommunity}
-              className="inline-block px-8 py-3 bg-red-900 text-white font-bold rounded hover:bg-red-800 transition cursor-pointer">
+            <button onClick={onOpenCommunity} className="inline-block px-8 py-3 bg-red-900 text-white font-bold rounded hover:bg-red-800 transition cursor-pointer">
               Join the Community
             </button>
           </div>
         </div>
       </section>
 
-      {/* Research & Opportunities */}
+      {/* Research & Opportunities — REAL DATA */}
       <section className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-4xl font-bold text-gray-900 mb-12">Research & Opportunities</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {[
-              { color: 'green', label: 'SCHOLARSHIPS', title: 'Graduate Study Program', desc: 'Full and partial scholarships for History and International Studies graduate programs.' },
-              { color: 'blue', label: 'CONFERENCES', title: 'International Symposium 2024', desc: 'Call for papers on contemporary international relations and historical research.' },
-              { color: 'purple', label: 'INTERNSHIPS', title: 'NGO & Think Tank Positions', desc: 'Gain practical experience with leading organizations in international development.' },
-              { color: 'pink', label: 'RESEARCH GRANTS', title: 'Academic Research Funding', desc: 'Support for undergraduate and graduate research projects in History and IS.' },
-              { color: 'yellow', label: 'VOLUNTEERING', title: 'Cultural Exchange Programs', desc: 'Volunteer opportunities with international organizations and community projects.' },
-              { color: 'red', label: 'CAREERS', title: 'Government & Diplomacy', desc: 'Career pathways in diplomacy, government service, and international relations.' },
-            ].map(item => (
-              <div key={item.title} className={`border-l-4 border-${item.color}-600 pl-6`}>
-                <span className={`text-sm font-bold text-${item.color}-600`}>{item.label}</span>
-                <h3 className="text-xl font-bold text-gray-900 mt-2 mb-2">{item.title}</h3>
-                <p className="text-gray-600 text-sm mb-4">{item.desc}</p>
-                <button className={`text-${item.color}-600 font-semibold hover:underline`}>Learn More →</button>
-              </div>
-            ))}
-          </div>
+          {researchItems.length === 0 ? (
+            <div className="bg-gray-50 rounded-lg p-12 text-center text-gray-400">
+              <p className="text-5xl mb-4">🔍</p>
+              <p className="text-lg font-semibold">No opportunities posted yet</p>
+              <p className="text-sm mt-2">Check back soon!</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {researchItems.map(item => {
+                const color = categoryColors[item.category] || 'red';
+                const label = categoryLabels[item.category] || item.category.toUpperCase();
+                return (
+                  <div key={item._id} className={`border-l-4 border-${color}-600 pl-6`}>
+                    <span className={`text-sm font-bold text-${color}-600`}>{label}</span>
+                    <h3 className="text-xl font-bold text-gray-900 mt-2 mb-2">{item.title}</h3>
+                    <p className="text-gray-600 text-sm mb-4">{item.description}</p>
+                    <a href={item.link} target="_blank" rel="noopener noreferrer"
+                      className={`text-${color}-600 font-semibold hover:underline`}>
+                      Learn More →
+                    </a>
+                  </div>
+                );
+              })}
+            </div>
+          )}
         </div>
       </section>
 
@@ -271,7 +282,6 @@ const HomePage = ({ onStartLearning, onExploreCourses, onOpenCommunity, isAuthen
                 Get Started
               </button>
             </div>
-
             <div className="bg-red-900 text-white rounded-lg shadow-lg p-8 relative md:scale-105">
               <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-yellow-400 text-red-900 px-4 py-1 rounded-full text-sm font-bold">MOST POPULAR</div>
               <h3 className="text-2xl font-bold mb-6">Pro</h3>
@@ -285,7 +295,6 @@ const HomePage = ({ onStartLearning, onExploreCourses, onOpenCommunity, isAuthen
                 Start Your Free Trial
               </button>
             </div>
-
             <div className="bg-white rounded-lg shadow-md p-8">
               <h3 className="text-2xl font-bold text-gray-900 mb-6">Plus</h3>
               <p className="text-4xl font-bold text-gray-900 mb-6">N3000<span className="text-lg text-gray-600">/month</span></p>
@@ -307,8 +316,7 @@ const HomePage = ({ onStartLearning, onExploreCourses, onOpenCommunity, isAuthen
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-4xl font-bold mb-6">Ready to Excel?</h2>
           <p className="text-xl mb-8 text-red-100">Join thousands of students succeeding with HISSA Connect</p>
-          <button onClick={onStartLearning}
-            className="inline-block px-8 py-3 bg-white text-red-900 font-bold rounded hover:bg-red-50 transition cursor-pointer">
+          <button onClick={onStartLearning} className="inline-block px-8 py-3 bg-white text-red-900 font-bold rounded hover:bg-red-50 transition cursor-pointer">
             Start Your Free Trial Today
           </button>
         </div>

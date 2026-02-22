@@ -44,6 +44,35 @@ const AdminDashboard = ({ user }) => {
     }
   };
 
+  const [researchData, setResearchData] = useState({
+  title: '', description: '', category: 'scholarships', link: '',
+});
+
+const handleResearchChange = (e) => {
+  const { name, value } = e.target;
+  setResearchData(prev => ({ ...prev, [name]: value }));
+};
+
+const handleAddResearch = async (e) => {
+  e.preventDefault();
+  setLoading(true);
+  setError('');
+  try {
+    const response = await axios.post(`${API_URL}/api/admin/research`, researchData, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    if (response.data.success) {
+      setSuccess('Opportunity added successfully!');
+      setResearchData({ title: '', description: '', category: 'scholarships', link: '' });
+      setTimeout(() => setSuccess(''), 3000);
+    }
+  } catch (err) {
+    setError(err.response?.data?.message || 'Failed to add opportunity');
+  } finally {
+    setLoading(false);
+  }
+};
+
   const handleFileChange = (e) => {
     setUploadData(prev => ({ ...prev, file: e.target.files[0] }));
   };
@@ -261,6 +290,48 @@ const AdminDashboard = ({ user }) => {
           </div>
         </div>
       )}
+
+      {activeTab === 'research' && (
+  <div className="bg-white rounded-lg shadow-md p-8 max-w-2xl">
+    <h2 className="text-2xl font-bold text-gray-900 mb-6">Add Research & Opportunity</h2>
+    <form onSubmit={handleAddResearch} className="space-y-6">
+      <div>
+        <label className="block text-sm font-semibold text-gray-900 mb-2">Title</label>
+        <input type="text" name="title" value={researchData.title} onChange={handleResearchChange}
+          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-red-900"
+          placeholder="e.g., Graduate Study Scholarship 2025" required />
+      </div>
+      <div>
+        <label className="block text-sm font-semibold text-gray-900 mb-2">Description</label>
+        <textarea name="description" value={researchData.description} onChange={handleResearchChange}
+          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-red-900"
+          rows="3" placeholder="Brief description of the opportunity" required></textarea>
+      </div>
+      <div>
+        <label className="block text-sm font-semibold text-gray-900 mb-2">Category</label>
+        <select name="category" value={researchData.category} onChange={handleResearchChange}
+          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-red-900">
+          <option value="scholarships">Scholarships</option>
+          <option value="conferences">Conferences</option>
+          <option value="internships">Internships</option>
+          <option value="research-grants">Research Grants</option>
+          <option value="volunteering">Volunteering</option>
+          <option value="careers">Careers</option>
+        </select>
+      </div>
+      <div>
+        <label className="block text-sm font-semibold text-gray-900 mb-2">Link URL</label>
+        <input type="url" name="link" value={researchData.link} onChange={handleResearchChange}
+          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-red-900"
+          placeholder="https://example.com/opportunity" required />
+      </div>
+      <button type="submit" disabled={loading}
+        className="w-full py-2 bg-red-900 text-white font-semibold rounded-lg hover:bg-red-800 transition disabled:opacity-50">
+        {loading ? 'Adding...' : 'Add Opportunity'}
+      </button>
+    </form>
+  </div>
+)}
     </div>
   );
 };
