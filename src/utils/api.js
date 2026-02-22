@@ -1,6 +1,37 @@
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
-// Authentication endpoints
+export const registerUser = async (userData) => {
+  try {
+    const response = await fetch(`${API_URL}/api/auth/register`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(userData),
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.message || 'Registration failed');
+    return data;
+  } catch (error) {
+    console.error('Registration error:', error);
+    throw error;
+  }
+};
+
+export const verifyEmail = async (email, code) => {
+  try {
+    const response = await fetch(`${API_URL}/api/auth/verify-email`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, code }),
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.message || 'Verification failed');
+    return data;
+  } catch (error) {
+    console.error('Verification error:', error);
+    throw error;
+  }
+};
+
 export const loginUser = async (email, password) => {
   try {
     const response = await fetch(`${API_URL}/api/auth/login`, {
@@ -19,26 +50,7 @@ export const loginUser = async (email, password) => {
     throw error;
   }
 };
-export const registerUser = async (userData) => {
-  try {
-    const response = await fetch(`${API_URL}/api/auth/register`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(userData),
-    });
-    const data = await response.json();
-    if (!response.ok) {
-      console.error('Server error response:', data);
-      throw new Error(data.message || 'Registration failed');
-    }
-    return data;
-  } catch (error) {
-    console.error('Registration error:', error);
-    throw error;
-  }
-};
 
-// Add any other API calls your components need
 export const fetchUserData = async (token) => {
   try {
     const response = await fetch(`${API_URL}/api/user`, {
