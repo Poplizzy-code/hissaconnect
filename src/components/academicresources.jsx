@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
 const AcademicResourcesPage = () => {
-  const [step, setStep] = useState(1); // Step 1: Choose Level, Step 2: View Resources
+  const [step, setStep] = useState(1);
   const [selectedLevel, setSelectedLevel] = useState(null);
   const [resources, setResources] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -18,11 +20,9 @@ const AcademicResourcesPage = () => {
     try {
       const token = localStorage.getItem('token');
       const response = await axios.get(
-        `http://localhost:5000/api/resources/academic/${level}`,
+        `${API_URL}/api/resources/academic/${level}`,
         {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
+          headers: { Authorization: `Bearer ${token}` }
         }
       );
 
@@ -32,6 +32,7 @@ const AcademicResourcesPage = () => {
       }
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to load resources');
+    } finally {
       setLoading(false);
     }
   };
@@ -44,7 +45,6 @@ const AcademicResourcesPage = () => {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-      {/* Header */}
       <div className="mb-12">
         <h1 className="text-4xl font-bold text-gray-900 mb-2">Academic Resources</h1>
         <p className="text-lg text-gray-600">
@@ -100,29 +100,32 @@ const AcademicResourcesPage = () => {
             </div>
           ) : resources.length === 0 ? (
             <div className="bg-white rounded-lg shadow-md p-12 text-center">
+              <p className="text-4xl mb-3">📭</p>
               <p className="text-gray-600 text-lg">No resources available for this level yet.</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {resources.map((resource) => (
-                <div key={resource.id} className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition">
+                <div key={resource._id} className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition">
                   <div className="flex items-start justify-between mb-4">
                     <div className="text-3xl">
                       {resource.fileType === 'pdf' && '📄'}
                       {resource.fileType === 'image' && '🖼️'}
                       {resource.fileType === 'document' && '📋'}
                     </div>
-                    <span className="px-3 py-1 bg-red-100 text-red-900 text-xs font-semibold rounded-full">
+                    <span className="px-3 py-1 bg-red-100 text-red-900 text-xs font-semibold rounded-full capitalize">
                       {resource.section}
                     </span>
                   </div>
                   <h3 className="text-lg font-bold text-gray-900 mb-2">{resource.title}</h3>
                   <p className="text-gray-600 text-sm mb-4">{resource.description}</p>
-                  <div className="flex items-center space-x-4 text-sm text-gray-500 mb-4">
+                  <div className="flex items-center text-sm text-gray-500 mb-4">
                     <span>📅 {new Date(resource.createdAt).toLocaleDateString()}</span>
                   </div>
-                  <a href={resource.fileUrl}
-                    download
+                  <a
+                    href={resource.fileUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="w-full px-4 py-2 bg-red-900 text-white font-semibold rounded hover:bg-red-800 transition text-center block"
                   >
                     Download
