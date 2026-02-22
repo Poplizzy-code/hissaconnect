@@ -18,6 +18,7 @@ function App() {
   const [showLogin, setShowLogin] = useState(false);
   const [showRegister, setShowRegister] = useState(false);
   const [showCommunity, setShowCommunity] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -42,11 +43,12 @@ function App() {
     localStorage.removeItem("user");
     setUser(null);
     setIsAuthenticated(false);
+    navigate("/");
   };
 
   const handleStartLearning = () => {
     if (isAuthenticated) {
-      window.location.href = "/dashboard";
+      navigate("/dashboard");
     } else {
       setShowRegister(true);
     }
@@ -54,7 +56,7 @@ function App() {
 
   const handleExploreCourses = () => {
     if (isAuthenticated) {
-      window.location.href = "/resources";
+      navigate("/resources");
     } else {
       setShowLogin(true);
     }

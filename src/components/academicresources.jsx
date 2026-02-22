@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
@@ -9,6 +10,7 @@ const AcademicResourcesPage = () => {
   const [resources, setResources] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const navigate = useNavigate();
 
   const levels = ['100', '200', '300', '400'];
 
@@ -21,9 +23,7 @@ const AcademicResourcesPage = () => {
       const token = localStorage.getItem('token');
       const response = await axios.get(
         `${API_URL}/api/resources/academic/${level}`,
-        {
-          headers: { Authorization: `Bearer ${token}` }
-        }
+        { headers: { Authorization: `Bearer ${token}` } }
       );
 
       if (response.data.success) {
@@ -45,7 +45,18 @@ const AcademicResourcesPage = () => {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+
+      {/* Header with Back to Home */}
       <div className="mb-12">
+        <button
+          onClick={() => navigate('/')}
+          className="flex items-center space-x-2 text-red-900 hover:text-red-800 font-semibold mb-6"
+        >
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+          </svg>
+          <span>Back to Home</span>
+        </button>
         <h1 className="text-4xl font-bold text-gray-900 mb-2">Academic Resources</h1>
         <p className="text-lg text-gray-600">
           Access curated lecture notes, study materials, and past questions organized by academic level.
