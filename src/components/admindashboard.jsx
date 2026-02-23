@@ -6,12 +6,10 @@ const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 const AdminDashboard = ({ user }) => {
   const [activeTab, setActiveTab] = useState('overview');
   const [uploadData, setUploadData] = useState({
-    title: '',
-    description: '',
-    level: '100',
-    section: 'academic',
-    file: null,
-    fileType: 'pdf',
+    title: '', description: '', level: '100', section: 'academic', file: null, fileType: 'pdf',
+  });
+  const [researchData, setResearchData] = useState({
+    title: '', description: '', category: 'scholarships', link: '',
   });
   const [users, setUsers] = useState([]);
   const [stats, setStats] = useState({ totalUsers: 0, totalResources: 0, adminUsers: 0 });
@@ -21,9 +19,7 @@ const AdminDashboard = ({ user }) => {
 
   const token = localStorage.getItem('token');
 
-  useEffect(() => {
-    fetchUsers();
-  }, []);
+  useEffect(() => { fetchUsers(); }, []);
 
   const fetchUsers = async () => {
     try {
@@ -44,34 +40,30 @@ const AdminDashboard = ({ user }) => {
     }
   };
 
-  const [researchData, setResearchData] = useState({
-  title: '', description: '', category: 'scholarships', link: '',
-});
+  const handleResearchChange = (e) => {
+    const { name, value } = e.target;
+    setResearchData(prev => ({ ...prev, [name]: value }));
+  };
 
-const handleResearchChange = (e) => {
-  const { name, value } = e.target;
-  setResearchData(prev => ({ ...prev, [name]: value }));
-};
-
-const handleAddResearch = async (e) => {
-  e.preventDefault();
-  setLoading(true);
-  setError('');
-  try {
-    const response = await axios.post(`${API_URL}/api/admin/research`, researchData, {
-      headers: { Authorization: `Bearer ${token}` }
-    });
-    if (response.data.success) {
-      setSuccess('Opportunity added successfully!');
-      setResearchData({ title: '', description: '', category: 'scholarships', link: '' });
-      setTimeout(() => setSuccess(''), 3000);
+  const handleAddResearch = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError('');
+    try {
+      const response = await axios.post(`${API_URL}/api/admin/research`, researchData, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (response.data.success) {
+        setSuccess('Opportunity added successfully!');
+        setResearchData({ title: '', description: '', category: 'scholarships', link: '' });
+        setTimeout(() => setSuccess(''), 3000);
+      }
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to add opportunity');
+    } finally {
+      setLoading(false);
     }
-  } catch (err) {
-    setError(err.response?.data?.message || 'Failed to add opportunity');
-  } finally {
-    setLoading(false);
-  }
-};
+  };
 
   const handleFileChange = (e) => {
     setUploadData(prev => ({ ...prev, file: e.target.files[0] }));
@@ -84,14 +76,9 @@ const handleAddResearch = async (e) => {
 
   const handleUpload = async (e) => {
     e.preventDefault();
-    if (!uploadData.file) {
-      setError('Please select a file');
-      return;
-    }
-
+    if (!uploadData.file) { setError('Please select a file'); return; }
     setLoading(true);
     setError('');
-
     const formData = new FormData();
     formData.append('title', uploadData.title);
     formData.append('description', uploadData.description);
@@ -99,15 +86,10 @@ const handleAddResearch = async (e) => {
     formData.append('section', uploadData.section);
     formData.append('file', uploadData.file);
     formData.append('fileType', uploadData.fileType);
-
     try {
       const response = await axios.post(`${API_URL}/api/admin/upload-resource`, formData, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'multipart/form-data',
-        }
+        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'multipart/form-data' }
       });
-
       if (response.data.success) {
         setSuccess('Resource uploaded successfully!');
         setUploadData({ title: '', description: '', level: '100', section: 'academic', file: null, fileType: 'pdf' });
@@ -123,11 +105,9 @@ const handleAddResearch = async (e) => {
   const handleMakeAdmin = async (userId) => {
     try {
       const response = await axios.post(
-        `${API_URL}/api/admin/make-admin/${userId}`,
-        {},
+        `${API_URL}/api/admin/make-admin/${userId}`, {},
         { headers: { Authorization: `Bearer ${token}` } }
       );
-
       if (response.data.success) {
         setSuccess('User promoted to admin!');
         setUsers(users.map(u => u._id === userId ? { ...u, role: 'admin' } : u));
@@ -137,6 +117,13 @@ const handleAddResearch = async (e) => {
       setError(err.response?.data?.message || 'Failed to make admin');
     }
   };
+
+  const tabs = [
+    { key: 'overview', label: 'Overview' },
+    { key: 'upload', label: 'Upload Resources' },
+    { key: 'research', label: 'Research & Opportunities' },
+    { key: 'users', label: 'Manage Users' },
+  ];
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -158,16 +145,16 @@ const handleAddResearch = async (e) => {
       )}
 
       {/* Tabs */}
-      <div className="flex space-x-6 border-b border-gray-300 mb-8">
-        {['overview', 'upload', 'users'].map(tab => (
+      <div className="flex flex-wrap gap-2 border-b border-gray-300 mb-8">
+        {tabs.map(tab => (
           <button
-            key={tab}
-            onClick={() => setActiveTab(tab)}
-            className={`px-4 py-2 font-semibold capitalize transition-colors ${
-              activeTab === tab ? 'text-red-900 border-b-2 border-red-900' : 'text-gray-600 hover:text-red-900'
+            key={tab.key}
+            onClick={() => setActiveTab(tab.key)}
+            className={`px-4 py-2 font-semibold transition-colors ${
+              activeTab === tab.key ? 'text-red-900 border-b-2 border-red-900' : 'text-gray-600 hover:text-red-900'
             }`}
           >
-            {tab === 'upload' ? 'Upload Resources' : tab === 'users' ? 'Manage Users' : 'Overview'}
+            {tab.label}
           </button>
         ))}
       </div>
@@ -248,6 +235,51 @@ const handleAddResearch = async (e) => {
         </div>
       )}
 
+      {/* Research & Opportunities Tab */}
+      {activeTab === 'research' && (
+        <div className="bg-white rounded-lg shadow-md p-8 max-w-2xl">
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">Add Research & Opportunity</h2>
+          <p className="text-gray-500 text-sm mb-6">Add a link to an external article or opportunity page</p>
+          <form onSubmit={handleAddResearch} className="space-y-6">
+            <div>
+              <label className="block text-sm font-semibold text-gray-900 mb-2">Title</label>
+              <input type="text" name="title" value={researchData.title} onChange={handleResearchChange}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-red-900"
+                placeholder="e.g., Graduate Study Scholarship 2025" required />
+            </div>
+            <div>
+              <label className="block text-sm font-semibold text-gray-900 mb-2">Description</label>
+              <textarea name="description" value={researchData.description} onChange={handleResearchChange}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-red-900"
+                rows="3" placeholder="Brief description of the opportunity" required></textarea>
+            </div>
+            <div>
+              <label className="block text-sm font-semibold text-gray-900 mb-2">Category</label>
+              <select name="category" value={researchData.category} onChange={handleResearchChange}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-red-900">
+                <option value="scholarships">Scholarships</option>
+                <option value="conferences">Conferences</option>
+                <option value="internships">Internships</option>
+                <option value="research-grants">Research Grants</option>
+                <option value="volunteering">Volunteering</option>
+                <option value="careers">Careers</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-semibold text-gray-900 mb-2">Link URL</label>
+              <p className="text-xs text-gray-500 mb-2">Paste the full URL to the article or opportunity page</p>
+              <input type="url" name="link" value={researchData.link} onChange={handleResearchChange}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-red-900"
+                placeholder="https://example.com/scholarship-details" required />
+            </div>
+            <button type="submit" disabled={loading}
+              className="w-full py-2 bg-red-900 text-white font-semibold rounded-lg hover:bg-red-800 transition disabled:opacity-50">
+              {loading ? 'Adding...' : 'Add Opportunity'}
+            </button>
+          </form>
+        </div>
+      )}
+
       {/* Users Tab */}
       {activeTab === 'users' && (
         <div className="bg-white rounded-lg shadow-md overflow-hidden">
@@ -290,48 +322,6 @@ const handleAddResearch = async (e) => {
           </div>
         </div>
       )}
-
-      {activeTab === 'research' && (
-  <div className="bg-white rounded-lg shadow-md p-8 max-w-2xl">
-    <h2 className="text-2xl font-bold text-gray-900 mb-6">Add Research & Opportunity</h2>
-    <form onSubmit={handleAddResearch} className="space-y-6">
-      <div>
-        <label className="block text-sm font-semibold text-gray-900 mb-2">Title</label>
-        <input type="text" name="title" value={researchData.title} onChange={handleResearchChange}
-          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-red-900"
-          placeholder="e.g., Graduate Study Scholarship 2025" required />
-      </div>
-      <div>
-        <label className="block text-sm font-semibold text-gray-900 mb-2">Description</label>
-        <textarea name="description" value={researchData.description} onChange={handleResearchChange}
-          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-red-900"
-          rows="3" placeholder="Brief description of the opportunity" required></textarea>
-      </div>
-      <div>
-        <label className="block text-sm font-semibold text-gray-900 mb-2">Category</label>
-        <select name="category" value={researchData.category} onChange={handleResearchChange}
-          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-red-900">
-          <option value="scholarships">Scholarships</option>
-          <option value="conferences">Conferences</option>
-          <option value="internships">Internships</option>
-          <option value="research-grants">Research Grants</option>
-          <option value="volunteering">Volunteering</option>
-          <option value="careers">Careers</option>
-        </select>
-      </div>
-      <div>
-        <label className="block text-sm font-semibold text-gray-900 mb-2">Link URL</label>
-        <input type="url" name="link" value={researchData.link} onChange={handleResearchChange}
-          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-red-900"
-          placeholder="https://example.com/opportunity" required />
-      </div>
-      <button type="submit" disabled={loading}
-        className="w-full py-2 bg-red-900 text-white font-semibold rounded-lg hover:bg-red-800 transition disabled:opacity-50">
-        {loading ? 'Adding...' : 'Add Opportunity'}
-      </button>
-    </form>
-  </div>
-)}
     </div>
   );
 };

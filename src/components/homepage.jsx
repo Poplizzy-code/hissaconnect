@@ -22,6 +22,24 @@ const categoryLabels = {
   careers: 'CAREERS',
 };
 
+const categoryBorderColors = {
+  scholarships: '#16a34a',
+  conferences: '#2563eb',
+  internships: '#9333ea',
+  'research-grants': '#db2777',
+  volunteering: '#ca8a04',
+  careers: '#dc2626',
+};
+
+const categoryTextColors = {
+  scholarships: '#16a34a',
+  conferences: '#2563eb',
+  internships: '#9333ea',
+  'research-grants': '#db2777',
+  volunteering: '#ca8a04',
+  careers: '#dc2626',
+};
+
 const HomePage = ({ onStartLearning, onExploreCourses, onOpenCommunity, isAuthenticated }) => {
   const [recentResources, setRecentResources] = useState([]);
   const [researchItems, setResearchItems] = useState([]);
@@ -61,8 +79,15 @@ const HomePage = ({ onStartLearning, onExploreCourses, onOpenCommunity, isAuthen
     return '📋';
   };
 
+  const getFileUrl = (url) => {
+    if (!url) return url;
+    if (url.includes('/upload/')) return url.replace('/upload/', '/upload/fl_attachment/');
+    return url;
+  };
+
   return (
     <div className="min-h-screen bg-white">
+
       {/* Hero Section */}
       <section className="bg-red-900 text-white py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -136,7 +161,7 @@ const HomePage = ({ onStartLearning, onExploreCourses, onOpenCommunity, isAuthen
         </div>
       </section>
 
-      {/* Academic Resources */}
+      {/* Academic Resources — REAL DATA, MOBILE FIXED */}
       <section className="py-20 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center mb-12">
@@ -150,7 +175,7 @@ const HomePage = ({ onStartLearning, onExploreCourses, onOpenCommunity, isAuthen
               <p className="text-sm mt-2">Check back soon!</p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
               {recentResources.map((resource, index) => (
                 <div key={resource._id} className="bg-white rounded-lg overflow-hidden shadow-md hover:shadow-lg transition">
                   <div className={`w-full h-48 bg-gradient-to-br ${getBgColor(index)} flex items-center justify-center text-6xl`}>
@@ -159,8 +184,18 @@ const HomePage = ({ onStartLearning, onExploreCourses, onOpenCommunity, isAuthen
                   <div className="p-6">
                     <span className="text-sm font-semibold text-red-900 bg-red-100 px-3 py-1 rounded uppercase">{resource.section}</span>
                     <h3 className="text-xl font-bold text-gray-900 mt-3 mb-2">{resource.title}</h3>
-                    <p className="text-gray-600 text-sm mb-4 line-clamp-2">{resource.description}</p>
-                    <a href={resource.fileUrl} target="_blank" rel="noopener noreferrer"
+                    <p className="text-gray-600 text-sm mb-4" style={{
+                      overflow: 'hidden',
+                      display: '-webkit-box',
+                      WebkitLineClamp: 2,
+                      WebkitBoxOrient: 'vertical'
+                    }}>
+                      {resource.description}
+                    </p>
+                    <a
+                      href={getFileUrl(resource.fileUrl)}
+                      target="_blank"
+                      rel="noopener noreferrer"
                       className="w-full py-2 bg-red-900 text-white font-semibold rounded hover:bg-red-800 transition block text-center">
                       Access Resource
                     </a>
@@ -238,17 +273,22 @@ const HomePage = ({ onStartLearning, onExploreCourses, onOpenCommunity, isAuthen
               <p className="text-sm mt-2">Check back soon!</p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
               {researchItems.map(item => {
-                const color = categoryColors[item.category] || 'red';
+                const borderColor = categoryBorderColors[item.category] || '#dc2626';
+                const textColor = categoryTextColors[item.category] || '#dc2626';
                 const label = categoryLabels[item.category] || item.category.toUpperCase();
                 return (
-                  <div key={item._id} className={`border-l-4 border-${color}-600 pl-6`}>
-                    <span className={`text-sm font-bold text-${color}-600`}>{label}</span>
+                  <div key={item._id} style={{ borderLeftColor: borderColor }} className="border-l-4 pl-6">
+                    <span style={{ color: textColor }} className="text-sm font-bold">{label}</span>
                     <h3 className="text-xl font-bold text-gray-900 mt-2 mb-2">{item.title}</h3>
                     <p className="text-gray-600 text-sm mb-4">{item.description}</p>
-                    <a href={item.link} target="_blank" rel="noopener noreferrer"
-                      className={`text-${color}-600 font-semibold hover:underline`}>
+                    <a
+                      href={item.link}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{ color: textColor }}
+                      className="font-semibold hover:underline">
                       Learn More →
                     </a>
                   </div>
@@ -321,6 +361,7 @@ const HomePage = ({ onStartLearning, onExploreCourses, onOpenCommunity, isAuthen
           </button>
         </div>
       </section>
+
     </div>
   );
 };
