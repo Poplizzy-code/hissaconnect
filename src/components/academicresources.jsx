@@ -14,6 +14,12 @@ const AcademicResourcesPage = () => {
 
   const levels = ['100', '200', '300', '400'];
 
+  const getFileUrl = (url) => {
+    if (!url) return url;
+    if (url.includes('/upload/')) return url.replace('/upload/', '/upload/fl_attachment/');
+    return url;
+  };
+
   const handleLevelClick = async (level) => {
     setSelectedLevel(level);
     setLoading(true);
@@ -73,7 +79,7 @@ const AcademicResourcesPage = () => {
       {step === 1 && (
         <div>
           <h2 className="text-2xl font-bold text-gray-900 mb-8">Select Your Academic Level</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {levels.map((level) => (
               <button
                 key={level}
@@ -115,7 +121,7 @@ const AcademicResourcesPage = () => {
               <p className="text-gray-600 text-lg">No resources available for this level yet.</p>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {resources.map((resource) => (
                 <div key={resource._id} className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition">
                   <div className="flex items-start justify-between mb-4">
@@ -134,7 +140,7 @@ const AcademicResourcesPage = () => {
                     <span>📅 {new Date(resource.createdAt).toLocaleDateString()}</span>
                   </div>
                   <a
-                    href={resource.fileUrl}
+                    href={getFileUrl(resource.fileUrl)}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="w-full px-4 py-2 bg-red-900 text-white font-semibold rounded hover:bg-red-800 transition text-center block"
