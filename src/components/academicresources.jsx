@@ -14,9 +14,18 @@ const AcademicResourcesPage = () => {
 
   const levels = ['100', '200', '300', '400'];
 
-  const getFileUrl = (url) => {
+  const getFileUrl = (url, fileType) => {
     if (!url) return url;
-    if (url.includes('/upload/')) return url.replace('/upload/', '/upload/fl_attachment/');
+    // For PDFs, use fl_attachment:false to allow viewing in browser
+    if (fileType === 'pdf') {
+      if (url.includes('/upload/')) {
+        return url.replace('/upload/', '/upload/fl_attachment:false/');
+      }
+    }
+    // For images and documents, force download
+    if (url.includes('/upload/')) {
+      return url.replace('/upload/', '/upload/fl_attachment/');
+    }
     return url;
   };
 
@@ -79,7 +88,7 @@ const AcademicResourcesPage = () => {
       {step === 1 && (
         <div>
           <h2 className="text-2xl font-bold text-gray-900 mb-8">Select Your Academic Level</h2>
-          <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
             {levels.map((level) => (
               <button
                 key={level}
@@ -140,12 +149,12 @@ const AcademicResourcesPage = () => {
                     <span>📅 {new Date(resource.createdAt).toLocaleDateString()}</span>
                   </div>
                   <a
-                    href={getFileUrl(resource.fileUrl)}
+                    href={getFileUrl(resource.fileUrl, resource.fileType)}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="w-full px-4 py-2 bg-red-900 text-white font-semibold rounded hover:bg-red-800 transition text-center block"
                   >
-                    Download
+                    {resource.fileType === 'pdf' ? 'View PDF' : 'Download'}
                   </a>
                 </div>
               ))}
