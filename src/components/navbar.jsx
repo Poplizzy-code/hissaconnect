@@ -39,6 +39,11 @@ const Navbar = ({
               className="px-4 py-2 text-gray-700 hover:text-red-900 font-medium transition-colors">
               Home
             </Link>
+            <Link
+              to="/news"
+              className="px-4 py-2 text-gray-700 hover:text-red-900 font-medium transition-colors">
+              News
+            </Link>
             {isAuthenticated && (
               <>
                 <Link
@@ -116,6 +121,12 @@ const Navbar = ({
               className="block px-4 py-2 text-gray-700 hover:text-red-900 font-medium">
               Home
             </Link>
+            <Link
+              to="/news"
+              onClick={() => setIsOpen(false)}
+              className="block px-4 py-2 text-gray-700 hover:text-red-900 font-medium">
+              News
+            </Link>
             {isAuthenticated && (
               <>
                 <Link
@@ -125,11 +136,8 @@ const Navbar = ({
                   Resources
                 </Link>
                 <button
-                  onClick={() => {
-                    console.log("Community button clicked!"); // ADD THIS
-                    onCommunityClick();
-                  }}
-                  className="px-4 py-2 text-gray-700 hover:text-red-900 font-medium transition-colors">
+                  onClick={() => { onCommunityClick(); setIsOpen(false); }}
+                  className="block w-full text-left px-4 py-2 text-gray-700 hover:text-red-900 font-medium transition-colors">
                   Community
                 </button>
               </>

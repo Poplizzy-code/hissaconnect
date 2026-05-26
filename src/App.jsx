@@ -10,6 +10,7 @@ import DashboardPage from "./components/dashboardpage";
 import AdminDashboard from "./components/admindashboard";
 import AcademicResourcesPage from "./components/academicresources";
 import CommunityForumPage from "./components/communityforumpage";
+import NewsPage from "./components/newspage";
 import "./index.css";
 
 function App() {
@@ -144,6 +145,9 @@ function App() {
               />
             }
           />
+
+          {/* Public routes */}
+          <Route path="/news" element={<NewsPage />} />
 
           {isAuthenticated ? (
             <>
