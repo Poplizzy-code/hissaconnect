@@ -273,7 +273,7 @@ const AdminDashboard = ({ user }) => {
               <div>
                 <label className="block text-sm font-semibold text-gray-900 mb-1">Photos</label>
                 <p className="text-xs text-gray-500 mb-2">Upload one or more images (JPG, PNG, etc.)</p>
-                <input type="file" multiple accept="image/*"
+                <input type="file" multiple accept="image/*,image/jpeg,image/png,image/gif,image/webp,image/svg+xml"
                   onChange={(e) => setNewsImages(Array.from(e.target.files))}
                   className="w-full text-sm" />
                 {newsImages.length > 0 && <p className="text-xs text-green-600 mt-1">✓ {newsImages.length} photo(s) selected</p>}
@@ -281,7 +281,7 @@ const AdminDashboard = ({ user }) => {
               <div>
                 <label className="block text-sm font-semibold text-gray-900 mb-1">Videos</label>
                 <p className="text-xs text-gray-500 mb-2">Upload video files</p>
-                <input type="file" multiple accept="video/*"
+                <input type="file" multiple accept="video/*,video/mp4,video/webm,video/ogg,video/avi,video/mov,video/mkv"
                   onChange={(e) => setNewsVideos(Array.from(e.target.files))}
                   className="w-full text-sm" />
                 {newsVideos.length > 0 && <p className="text-xs text-green-600 mt-1">✓ {newsVideos.length} video(s) selected</p>}
@@ -295,7 +295,7 @@ const AdminDashboard = ({ user }) => {
               <div>
                 <label className="block text-sm font-semibold text-gray-900 mb-1">File Attachments</label>
                 <p className="text-xs text-gray-500 mb-2">Attach PDFs or documents</p>
-                <input type="file" multiple accept=".pdf,.doc,.docx,.ppt,.pptx"
+                <input type="file" multiple
                   onChange={(e) => setNewsFiles(Array.from(e.target.files))}
                   className="w-full text-sm" />
                 {newsFiles.length > 0 && <p className="text-xs text-green-600 mt-1">✓ {newsFiles.length} file(s) selected</p>}
