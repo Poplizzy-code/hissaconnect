@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
 const CATEGORIES = [
   { key: 'all', label: 'All News' },
@@ -41,7 +41,7 @@ const NewsPage = () => {
     setLoading(true);
     try {
       const params = activeCategory !== 'all' ? `?category=${activeCategory}` : '';
-      const res = await axios.get(`${API_URL}/news${params}`);
+      const res = await axios.get(`${API_URL}/api/news${params}`);
       if (res.data.success) setNews(res.data.data);
     } catch {
       setNews([]);

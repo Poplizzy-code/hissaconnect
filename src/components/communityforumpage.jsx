@@ -2,8 +2,8 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { io } from 'socket.io-client';
 import axios from 'axios';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
-const SOCKET_URL = API_URL.replace('/api', '');
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+const SOCKET_URL = API_URL;
 
 const getInitials = (firstName = '', lastName = '') =>
   `${firstName[0] || ''}${lastName[0] || ''}`.toUpperCase();
@@ -126,7 +126,7 @@ const CommunityForumPage = ({ user }) => {
 
   const loadConversations = useCallback(async () => {
     try {
-      const res = await axios.get(`${API_URL}/messages/conversations`, {
+      const res = await axios.get(`${API_URL}/api/messages/conversations`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (res.data.success) setConversations(res.data.data);
@@ -135,7 +135,7 @@ const CommunityForumPage = ({ user }) => {
 
   const loadGroups = useCallback(async () => {
     try {
-      const res = await axios.get(`${API_URL}/messages/groups`, {
+      const res = await axios.get(`${API_URL}/api/messages/groups`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (res.data.success) setGroups(res.data.data);
@@ -152,7 +152,7 @@ const CommunityForumPage = ({ user }) => {
     setPendingRecipient(null);
     setLoading(true);
     try {
-      const res = await axios.get(`${API_URL}/messages/conversation/${conv._id}`, {
+      const res = await axios.get(`${API_URL}/api/messages/conversation/${conv._id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (res.data.success) setMessages(res.data.data.messages || []);
@@ -216,7 +216,7 @@ const CommunityForumPage = ({ user }) => {
     setUserSearch(q);
     if (!q.trim()) { setUserResults([]); return; }
     try {
-      const res = await axios.get(`${API_URL}/messages/users?search=${q}`, {
+      const res = await axios.get(`${API_URL}/api/messages/users?search=${q}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (res.data.success) setUserResults(res.data.data);
@@ -227,7 +227,7 @@ const CommunityForumPage = ({ user }) => {
     if (!groupName.trim()) return;
     try {
       const res = await axios.post(
-        `${API_URL}/messages/groups`,
+        `${API_URL}/api/messages/groups`,
         { name: groupName, memberIds: selectedMembers.map((m) => m._id) },
         { headers: { Authorization: `Bearer ${token}` } }
       );
