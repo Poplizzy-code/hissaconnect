@@ -48,10 +48,11 @@ const HomePage = ({ onStartLearning, onExploreCourses, onOpenCommunity, isAuthen
     const fetchData = async () => {
       try {
         const token = localStorage.getItem('token');
-        const headers = token ? { Authorization: `Bearer ${token}` } : {};
 
         const [resourcesRes, researchRes] = await Promise.all([
-          axios.get(`${API_URL}/api/resources`, { headers }),
+          token
+            ? axios.get(`${API_URL}/api/resources`, { headers: { Authorization: `Bearer ${token}` } })
+            : Promise.resolve({ data: { success: false, data: [] } }),
           axios.get(`${API_URL}/api/admin/research`),
         ]);
 
