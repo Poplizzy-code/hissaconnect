@@ -88,12 +88,10 @@ const HomePage = ({ onStartLearning, onExploreCourses, onOpenCommunity, isAuthen
     <div className="min-h-screen bg-white">
 
       {/* ── 1. HERO ── */}
-      <section className="relative text-white py-28 overflow-hidden">
-        <img
-          src="/hissabg.jpeg"
-          alt=""
-          className="absolute inset-0 w-full h-full object-cover object-center"
-        />
+      <section
+        className="relative text-white py-28 overflow-hidden"
+        style={{ backgroundImage: 'url(/hissabg.jpeg)', backgroundSize: 'cover', backgroundPosition: 'center' }}
+      >
         {/* Red brand overlay */}
         <div className="absolute inset-0 bg-red-900 bg-opacity-75" />
 
