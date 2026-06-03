@@ -89,9 +89,8 @@ const HomePage = ({ onStartLearning, onExploreCourses, onOpenCommunity, isAuthen
 
       {/* ── 1. HERO ── */}
       <section className="relative text-white py-28 overflow-hidden">
-        {/* Background photo — lecture hall by Vitaly Gariev (Unsplash, free licence) */}
         <img
-          src="https://images.unsplash.com/photo-1758270705799-12efda48d4f4?auto=format&fit=crop&w=1920&q=80"
+          src="/hissabg.jpeg"
           alt=""
           className="absolute inset-0 w-full h-full object-cover object-center"
         />

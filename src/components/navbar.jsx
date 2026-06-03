@@ -24,9 +24,7 @@ const Navbar = ({
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-red-900 rounded flex items-center justify-center">
-              <span className="text-white font-bold text-lg">H</span>
-            </div>
+            <img src="/hissalogo.jpeg" alt="HISSA Connect" className="w-8 h-8 rounded object-cover" />
             <span className="hidden sm:block font-bold text-lg text-gray-900">
               HISSA Connect
             </span>
