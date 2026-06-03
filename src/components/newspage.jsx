@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import api from '../utils/api';
 
 const CATEGORIES = [
@@ -25,6 +26,7 @@ const getYouTubeId = (url) => {
 };
 
 const NewsPage = () => {
+  const navigate = useNavigate();
   const [news, setNews] = useState([]);
   const [activeCategory, setActiveCategory] = useState('all');
   const [loading, setLoading] = useState(true);
@@ -56,6 +58,12 @@ const NewsPage = () => {
       {/* Hero banner */}
       <div className="bg-red-900 text-white py-14 px-4">
         <div className="max-w-6xl mx-auto">
+          <button onClick={() => navigate(-1)} className="flex items-center gap-1.5 text-red-200 hover:text-white text-sm font-semibold mb-4 transition">
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+            Back
+          </button>
           <h1 className="text-4xl font-bold mb-2">News & Announcements</h1>
           <p className="text-red-200 text-lg">Stay up to date with the Department of History & International Studies</p>
         </div>

@@ -82,6 +82,12 @@ const RegisterPage = ({ onLogin }) => {
 
         {/* Right Panel */}
         <div className="bg-white p-8 md:p-10">
+          <button onClick={() => navigate(-1)} className="flex items-center gap-1.5 text-gray-500 hover:text-red-900 text-sm font-semibold mb-6 transition w-fit">
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+            </svg>
+            Back
+          </button>
           <h2 className="text-3xl font-bold text-gray-900 mb-2">Create Account</h2>
           <p className="text-gray-500 mb-6">Enter your details to get started</p>
 

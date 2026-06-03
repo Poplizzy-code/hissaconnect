@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { io } from 'socket.io-client';
+import { useNavigate } from 'react-router-dom';
 import api from '../utils/api';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
@@ -44,6 +45,7 @@ const Toast = ({ toast }) => {
 };
 
 const CommunityForumPage = ({ user }) => {
+  const navigate = useNavigate();
   const [socket, setSocket] = useState(null);
   const [activeTab, setActiveTab] = useState('messages');
   const [conversations, setConversations] = useState([]);
@@ -395,10 +397,15 @@ const CommunityForumPage = ({ user }) => {
       {/* Sidebar */}
       <div className={`${mobileView === 'chat' ? 'hidden' : 'flex'} md:flex flex-col w-full md:w-80 lg:w-96 bg-white border-r border-gray-200 flex-shrink-0`}>
         {/* Sidebar header */}
-        <div className="bg-red-900 px-4 py-3 flex items-center justify-between">
-          <div className="flex items-center gap-3">
+        <div className="bg-red-900 px-3 py-3 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <button onClick={() => navigate(-1)} title="Leave Community" className="p-1.5 text-red-200 hover:text-white hover:bg-red-800 rounded-full transition flex-shrink-0">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+            </button>
             <Avatar firstName={user?.firstName} lastName={user?.lastName} size="md" photo={user?.profilePhoto} />
-            <span className="text-white font-bold text-lg">Community</span>
+            <span className="text-white font-bold text-base">Community</span>
           </div>
           <div className="flex gap-1 items-center">
             {/* Notification bell */}
@@ -729,8 +736,8 @@ const CommunityForumPage = ({ user }) => {
               placeholder={messageLimitReached ? 'Message limit reached…' : 'Type a message'}
               disabled={messageLimitReached}
               rows={1}
-              className="flex-1 resize-none overflow-y-auto px-4 py-2.5 bg-gray-100 rounded-2xl text-sm focus:outline-none focus:bg-white focus:ring-2 focus:ring-red-200 disabled:opacity-50 leading-relaxed"
-              style={{ minHeight: '44px', maxHeight: '96px' }}
+              className="flex-1 resize-none overflow-y-auto px-4 py-2.5 bg-gray-100 rounded-2xl focus:outline-none focus:bg-white focus:ring-2 focus:ring-red-200 disabled:opacity-50 leading-relaxed"
+              style={{ fontSize: '16px', minHeight: '44px', maxHeight: '88px' }}
             />
             <button onClick={sendMessage} disabled={!messageInput.trim() || messageLimitReached}
               className="w-11 h-11 bg-red-900 text-white rounded-full flex items-center justify-center hover:bg-red-800 active:scale-95 transition disabled:opacity-40 flex-shrink-0">

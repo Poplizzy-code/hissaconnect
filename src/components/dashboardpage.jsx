@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import api from '../utils/api';
 
 const DashboardPage = ({ user, onUserUpdate }) => {
+  const navigate = useNavigate();
   const isFirstTime = !user?.lastLogin;
   const [showEdit, setShowEdit] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -64,6 +65,12 @@ const DashboardPage = ({ user, onUserUpdate }) => {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <button onClick={() => navigate(-1)} className="flex items-center gap-1.5 text-red-900 hover:text-red-700 text-sm font-semibold mb-6 transition">
+        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+        </svg>
+        Back
+      </button>
       <div className="mb-12">
         <h1 className="text-4xl font-bold text-gray-900 mb-2">
           {isFirstTime ? `Welcome, ${user?.firstName}!` : `Welcome back, ${user?.firstName}!`}

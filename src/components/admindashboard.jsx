@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import api from '../utils/api';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
 const AdminDashboard = ({ user }) => {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('overview');
   const [uploadData, setUploadData] = useState({
     title: '', description: '', level: '100', section: 'academic', file: null, fileType: 'pdf',
@@ -235,6 +237,12 @@ const AdminDashboard = ({ user }) => {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <button onClick={() => navigate(-1)} className="flex items-center gap-1.5 text-red-900 hover:text-red-700 text-sm font-semibold mb-6 transition">
+        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+        </svg>
+        Back
+      </button>
       <div className="mb-8">
         <h1 className="text-4xl font-bold text-gray-900 mb-2">Admin Dashboard</h1>
         <p className="text-lg text-gray-600">Welcome, {user?.firstName}!</p>
@@ -253,12 +261,12 @@ const AdminDashboard = ({ user }) => {
       )}
 
       {/* Tabs */}
-      <div className="flex flex-wrap gap-2 border-b border-gray-300 mb-8">
+      <div className="flex overflow-x-auto gap-1 border-b border-gray-300 mb-8 pb-0 scrollbar-hide">
         {tabs.map(tab => (
           <button
             key={tab.key}
             onClick={() => setActiveTab(tab.key)}
-            className={`px-4 py-2 font-semibold transition-colors ${
+            className={`px-4 py-2 font-semibold transition-colors whitespace-nowrap flex-shrink-0 ${
               activeTab === tab.key ? 'text-red-900 border-b-2 border-red-900' : 'text-gray-600 hover:text-red-900'
             }`}
           >
@@ -445,15 +453,15 @@ const AdminDashboard = ({ user }) => {
           ) : (
             <div className="space-y-3">
               {resources.map((r) => (
-                <div key={r._id} className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50">
+                <div key={r._id} className="flex items-start sm:items-center justify-between p-3 sm:p-4 border border-gray-200 rounded-lg hover:bg-gray-50 gap-3">
                   <div className="flex-1 min-w-0">
-                    <p className="font-semibold text-gray-900 truncate">{r.title}</p>
+                    <p className="font-semibold text-gray-900 text-sm truncate">{r.title}</p>
                     <p className="text-xs text-gray-500 mt-0.5">
-                      Level {r.level} &middot; {r.section} &middot; {r.fileType.toUpperCase()}
+                      Level {r.level} &middot; <span className="capitalize">{r.section}</span> &middot; {r.fileType.toUpperCase()}
                     </p>
                   </div>
                   <button onClick={() => handleDeleteResource(r._id)}
-                    className="ml-4 px-3 py-1 text-red-600 hover:bg-red-50 rounded text-sm font-semibold transition flex-shrink-0">
+                    className="px-3 py-1.5 text-red-600 hover:bg-red-50 rounded text-xs font-semibold transition flex-shrink-0 border border-red-200">
                     Delete
                   </button>
                 </div>
@@ -516,13 +524,13 @@ const AdminDashboard = ({ user }) => {
           ) : (
             <div className="space-y-3">
               {researchItems.map((item) => (
-                <div key={item._id} className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50">
+                <div key={item._id} className="flex items-start sm:items-center justify-between p-3 sm:p-4 border border-gray-200 rounded-lg hover:bg-gray-50 gap-3">
                   <div className="flex-1 min-w-0">
-                    <p className="font-semibold text-gray-900 truncate">{item.title}</p>
-                    <p className="text-xs text-gray-500 mt-0.5 capitalize">{item.category} &middot; <a href={item.link} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">View Link</a></p>
+                    <p className="font-semibold text-gray-900 text-sm truncate">{item.title}</p>
+                    <p className="text-xs text-gray-500 mt-0.5 capitalize">{item.category} &middot; <a href={item.link} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline truncate">View Link</a></p>
                   </div>
                   <button onClick={() => handleDeleteResearch(item._id)}
-                    className="ml-4 px-3 py-1 text-red-600 hover:bg-red-50 rounded text-sm font-semibold transition flex-shrink-0">
+                    className="px-3 py-1.5 text-red-600 hover:bg-red-50 rounded text-xs font-semibold transition flex-shrink-0 border border-red-200">
                     Delete
                   </button>
                 </div>
