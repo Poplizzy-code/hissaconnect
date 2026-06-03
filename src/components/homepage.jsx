@@ -88,11 +88,11 @@ const HomePage = ({ onStartLearning, onExploreCourses, onOpenCommunity, isAuthen
     <div className="min-h-screen bg-white">
 
       {/* ── 1. HERO ── */}
-      {/* To add a background image: place your image at frontend/public/hero-bg.jpg */}
+      {/* Hero background: lecture hall photo by Vitaly Gariev (Unsplash, free licence) */}
       <section
         className="relative text-white py-28 bg-red-900"
         style={{
-          backgroundImage: 'url(/hero-bg.jpg)',
+          backgroundImage: 'url(https://images.unsplash.com/photo-1758270705799-12efda48d4f4?auto=format&fit=crop&w=1920&q=80)',
           backgroundSize: 'cover',
           backgroundPosition: 'center',
         }}
