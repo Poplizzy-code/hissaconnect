@@ -393,19 +393,27 @@ const CommunityForumPage = ({ user }) => {
   const showLimit = activeConv?.conversationType === 'direct' && dmFriendStatus && !dmFriendStatus.isFriend;
 
   return (
-    <div className="w-full h-full bg-gray-100 flex overflow-hidden">
-      {/* Sidebar */}
-      <div className={`${mobileView === 'chat' ? 'hidden' : 'flex'} md:flex flex-col w-full md:w-80 lg:w-96 bg-white border-r border-gray-200 flex-shrink-0 min-h-0`}>
-        {/* Back bar */}
+    <div className="w-full h-full flex flex-col overflow-hidden bg-gray-100">
+
+      {/* ── Permanent top bar with back button — always visible ── */}
+      <div className="flex-shrink-0 bg-white border-b border-gray-200 px-4 py-2.5 flex items-center gap-3 shadow-sm z-20">
         <button
           onClick={() => navigate(-1)}
-          className="flex items-center gap-1.5 px-4 py-2 bg-white border-b border-gray-200 text-red-900 text-sm font-semibold hover:bg-red-50 transition w-full"
+          className="flex items-center gap-1.5 text-red-900 font-semibold text-sm px-3 py-1.5 rounded-lg hover:bg-red-50 active:bg-red-100 transition border border-red-200"
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
           </svg>
           Back
         </button>
+        <span className="text-gray-800 font-bold text-sm">Community Forum</span>
+      </div>
+
+      {/* ── Main forum content: sidebar + chat side by side ── */}
+      <div className="flex flex-1 min-h-0 overflow-hidden">
+
+      {/* Sidebar */}
+      <div className={`${mobileView === 'chat' ? 'hidden' : 'flex'} md:flex flex-col w-full md:w-80 lg:w-96 bg-white border-r border-gray-200 flex-shrink-0 min-h-0`}>
 
         {/* Sidebar header */}
         <div className="bg-red-900 px-3 py-3 flex items-center justify-between">
@@ -861,6 +869,9 @@ const CommunityForumPage = ({ user }) => {
         </div>
       )}
 
+      </div> {/* end flex-1 min-h-0 row */}
+
+      {/* Modals and toast sit outside the row so they overlay everything */}
       <Toast toast={toast} />
     </div>
   );
