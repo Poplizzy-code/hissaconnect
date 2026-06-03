@@ -68,6 +68,11 @@ const CommunityForumPage = ({ user }) => {
   const [peopleList, setPeopleList] = useState([]);
   const [peopleSearch, setPeopleSearch] = useState('');
   const [peopleLoading, setPeopleLoading] = useState(false);
+  // Add member to group
+  const [showAddMember, setShowAddMember] = useState(false);
+  const [addMemberSearch, setAddMemberSearch] = useState('');
+  const [addMemberResults, setAddMemberResults] = useState([]);
+  const [addingMember, setAddingMember] = useState(false);
   // Notifications
   const [notifications, setNotifications] = useState([]);
   const [showNotifications, setShowNotifications] = useState(false);
@@ -287,6 +292,36 @@ const CommunityForumPage = ({ user }) => {
       const res = await api.get(`/api/messages/users?search=${q}`);
       if (res.data.success) setUserResults(res.data.data);
     } catch {}
+  };
+
+  const searchAddMembers = async (q) => {
+    setAddMemberSearch(q);
+    if (!q.trim()) { setAddMemberResults([]); return; }
+    try {
+      const res = await api.get(`/api/messages/users?search=${q}`);
+      if (res.data.success) {
+        const existingIds = new Set(activeConv?.participants?.map((p) => p._id || p) || []);
+        setAddMemberResults(res.data.data.filter((u) => !existingIds.has(u._id)));
+      }
+    } catch {}
+  };
+
+  const handleAddMember = async (userId) => {
+    if (!activeConv?._id) return;
+    setAddingMember(true);
+    try {
+      const res = await api.post(`/api/messages/groups/${activeConv._id}/add-member`, { userId });
+      if (res.data.success) {
+        setActiveConv((prev) => ({ ...prev, participants: res.data.data.participants }));
+        showToast('Member added!', 'success');
+        setAddMemberResults((prev) => prev.filter((u) => u._id !== userId));
+        loadGroups();
+      }
+    } catch {
+      showToast('Failed to add member', 'error');
+    } finally {
+      setAddingMember(false);
+    }
   };
 
   const handleCreateGroup = async () => {
@@ -516,6 +551,17 @@ const CommunityForumPage = ({ user }) => {
           ))}
         </div>
 
+        {/* ← Back button — always visible in sidebar, every tab */}
+        <button
+          onClick={() => navigate(-1)}
+          className="flex items-center gap-2 w-full px-4 py-3 bg-red-50 border-b-2 border-red-200 text-red-900 font-bold text-sm hover:bg-red-100 active:bg-red-200 transition flex-shrink-0"
+        >
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7" />
+          </svg>
+          ← Back to Previous Page
+        </button>
+
         {/* People list */}
         {activeTab === 'people' && (
           <div className="flex flex-col flex-1 overflow-hidden">
@@ -664,7 +710,10 @@ const CommunityForumPage = ({ user }) => {
             <div className="flex-1 min-w-0">
               <p className="font-bold text-gray-900 truncate">{chatTitle}</p>
               {activeConv.conversationType === 'group' ? (
-                <p className="text-xs text-gray-500">{activeConv.participants?.length || 0} members</p>
+                <button onClick={() => { setShowAddMember(true); setAddMemberSearch(''); setAddMemberResults([]); }}
+                  className="text-xs text-red-700 hover:underline font-semibold">
+                  {activeConv.participants?.length || 0} members · + Add People
+                </button>
               ) : (
                 <div className="flex items-center gap-1">
                   <span className={`w-2 h-2 rounded-full flex-shrink-0 ${isOnline ? 'bg-green-500' : 'bg-gray-400'}`} />
@@ -826,8 +875,9 @@ const CommunityForumPage = ({ user }) => {
                 placeholder="Group name (e.g. HIS 301 Study Group)"
                 className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:border-red-900 text-sm" />
               <div>
-                <input type="text" value={userSearch} onChange={(e) => searchUsers(e.target.value)}
-                  placeholder="Add members by name or matric number..."
+                <p className="text-xs text-gray-500 mb-1">Search and tap to select multiple members</p>
+              <input type="text" value={userSearch} onChange={(e) => searchUsers(e.target.value)}
+                  placeholder="Search by name or matric number..."
                   className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:border-red-900 text-sm" />
                 <div className="mt-2 space-y-1 max-h-40 overflow-y-auto">
                   {userResults.map((u) => {
@@ -871,7 +921,51 @@ const CommunityForumPage = ({ user }) => {
 
       </div> {/* end flex-1 min-h-0 row */}
 
-      {/* Modals and toast sit outside the row so they overlay everything */}
+      {/* Add Member Modal */}
+      {showAddMember && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl w-full max-w-md shadow-2xl">
+            <div className="flex items-center justify-between p-5 border-b border-gray-200">
+              <div>
+                <h3 className="text-lg font-bold text-gray-900">Add People to Group</h3>
+                <p className="text-xs text-gray-500 mt-0.5">{activeConv?.groupName}</p>
+              </div>
+              <button onClick={() => setShowAddMember(false)} className="p-1 hover:bg-gray-100 rounded-full">
+                <svg className="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            <div className="p-5 space-y-3">
+              <input type="text" value={addMemberSearch} onChange={(e) => searchAddMembers(e.target.value)}
+                placeholder="Search by name or matric number..." autoFocus
+                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:border-red-900 text-sm" />
+              <div className="space-y-1 max-h-60 overflow-y-auto">
+                {addMemberResults.length === 0 && addMemberSearch && (
+                  <p className="text-center text-gray-400 text-sm py-4">No users found</p>
+                )}
+                {!addMemberSearch && (
+                  <p className="text-center text-gray-400 text-sm py-4">Search for classmates to add</p>
+                )}
+                {addMemberResults.map((u) => (
+                  <div key={u._id} className="flex items-center gap-3 px-3 py-2.5 hover:bg-gray-50 rounded-lg">
+                    <Avatar firstName={u.firstName} lastName={u.lastName} size="md" photo={u.profilePhoto} />
+                    <div className="flex-1 min-w-0">
+                      <p className="font-semibold text-gray-900 text-sm">{u.firstName} {u.lastName}</p>
+                      <p className="text-xs text-gray-500">{u.matricNo} · Level {u.currentLevel}</p>
+                    </div>
+                    <button onClick={() => handleAddMember(u._id)} disabled={addingMember}
+                      className="px-3 py-1.5 bg-red-900 text-white text-xs font-semibold rounded-lg hover:bg-red-800 transition disabled:opacity-50">
+                      Add
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       <Toast toast={toast} />
     </div>
   );
