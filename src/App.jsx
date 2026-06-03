@@ -79,6 +79,7 @@ function App() {
         onLogout={handleLogout}
         onLoginClick={() => setShowLogin(true)}
         onRegisterClick={() => setShowRegister(true)}
+        onCommunityClick={handleOpenCommunity}
       />
 
       {/* Login Modal */}

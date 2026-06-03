@@ -14,13 +14,9 @@ const AcademicResourcesPage = () => {
 
   const getFileUrl = (url, fileType) => {
     if (!url) return url;
-    // For PDFs, use fl_attachment:false to allow viewing in browser
-    if (fileType === 'pdf') {
-      if (url.includes('/upload/')) {
-        return url.replace('/upload/', '/upload/fl_attachment:false/');
-      }
-    }
-    // For images and documents, force download
+    // PDFs: serve as-is so the browser opens them natively
+    if (fileType === 'pdf') return url;
+    // Images and documents: force download via fl_attachment flag
     if (url.includes('/upload/')) {
       return url.replace('/upload/', '/upload/fl_attachment/');
     }

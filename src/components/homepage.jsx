@@ -38,20 +38,34 @@ const categoryTextColors = {
   careers: '#dc2626',
 };
 
+const CATEGORY_COLORS = {
+  general: 'bg-gray-100 text-gray-700',
+  academic: 'bg-blue-100 text-blue-700',
+  events: 'bg-purple-100 text-purple-700',
+  achievements: 'bg-yellow-100 text-yellow-700',
+};
+
+const getYouTubeId = (url) => {
+  const match = url.match(/(?:youtube\.com\/(?:[^/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?/\s]{11})/);
+  return match ? match[1] : null;
+};
+
 const HomePage = ({ onStartLearning, onExploreCourses, onOpenCommunity, isAuthenticated }) => {
   const [recentResources, setRecentResources] = useState([]);
   const [researchItems, setResearchItems] = useState([]);
+  const [recentNews, setRecentNews] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const token = localStorage.getItem('token');
 
-        const [resourcesRes, researchRes] = await Promise.all([
+        const [resourcesRes, researchRes, newsRes] = await Promise.all([
           token
             ? api.get('/api/resources')
             : Promise.resolve({ data: { success: false, data: [] } }),
           api.get('/api/admin/research'),
+          api.get('/api/news'),
         ]);
 
         if (resourcesRes.data.success) {
@@ -59,6 +73,9 @@ const HomePage = ({ onStartLearning, onExploreCourses, onOpenCommunity, isAuthen
         }
         if (researchRes.data.success) {
           setResearchItems(researchRes.data.data.slice(0, 6));
+        }
+        if (newsRes.data.success) {
+          setRecentNews(newsRes.data.data.slice(0, 3));
         }
       } catch (err) {
         console.error(err);
@@ -298,8 +315,75 @@ const HomePage = ({ onStartLearning, onExploreCourses, onOpenCommunity, isAuthen
         </div>
       </section>
 
-      {/* Pricing */}
+      {/* News & Announcements */}
       <section className="py-20 bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center mb-12">
+            <h2 className="text-4xl font-bold text-gray-900">News & Announcements</h2>
+            <Link to="/news" className="text-red-900 font-semibold hover:underline">View All News →</Link>
+          </div>
+          {recentNews.length === 0 ? (
+            <div className="bg-white rounded-lg shadow-md p-12 text-center text-gray-400">
+              <p className="text-5xl mb-4">📰</p>
+              <p className="text-lg font-semibold">No news yet</p>
+              <p className="text-sm mt-2">Check back soon for department updates!</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {recentNews.map((post) => (
+                <Link
+                  key={post._id}
+                  to="/news"
+                  className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow group"
+                >
+                  {post.images?.length > 0 ? (
+                    <div className="h-44 overflow-hidden">
+                      <img
+                        src={post.images[0].url}
+                        alt={post.title}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      />
+                    </div>
+                  ) : post.videos?.length > 0 && post.videos[0].videoType === 'youtube' ? (
+                    <div className="h-44 bg-gray-900 relative overflow-hidden">
+                      <img
+                        src={`https://img.youtube.com/vi/${getYouTubeId(post.videos[0].url)}/hqdefault.jpg`}
+                        alt={post.title}
+                        className="w-full h-full object-cover opacity-60"
+                      />
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <div className="w-12 h-12 bg-red-600 rounded-full flex items-center justify-center">
+                          <svg className="w-5 h-5 text-white ml-1" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z" /></svg>
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="h-44 bg-gradient-to-br from-red-900 to-red-700 flex items-center justify-center">
+                      <svg className="w-10 h-10 text-red-300 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
+                      </svg>
+                    </div>
+                  )}
+                  <div className="p-5">
+                    <span className={`text-xs font-semibold px-2.5 py-0.5 rounded-full capitalize ${CATEGORY_COLORS[post.category] || CATEGORY_COLORS.general}`}>
+                      {post.category}
+                    </span>
+                    <h3 className="font-bold text-gray-900 text-lg mt-2 mb-1 group-hover:text-red-900 transition-colors leading-snug">
+                      {post.title}
+                    </h3>
+                    <p className="text-gray-500 text-sm">
+                      {new Date(post.publishedAt).toLocaleDateString('en-NG', { day: 'numeric', month: 'long', year: 'numeric' })}
+                    </p>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          )}
+        </div>
+      </section>
+
+      {/* Pricing */}
+      <section className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-gray-900 mb-4">HISSA Connect Pro</h2>
