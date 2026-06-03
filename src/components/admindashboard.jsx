@@ -19,12 +19,13 @@ const AdminDashboard = ({ user }) => {
   const [newsFiles, setNewsFiles] = useState([]);
   const [newsList, setNewsList] = useState([]);
   const [users, setUsers] = useState([]);
+  const [resources, setResources] = useState([]);
   const [stats, setStats] = useState({ totalUsers: 0, totalResources: 0, adminUsers: 0 });
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => { fetchUsers(); fetchNews(); }, []);
+  useEffect(() => { fetchUsers(); fetchNews(); fetchResources(); }, []);
 
   const fetchUsers = async () => {
     try {
@@ -41,6 +42,16 @@ const AdminDashboard = ({ user }) => {
     } catch (err) {
       setError('Failed to fetch users');
     }
+  };
+
+  const fetchResources = async () => {
+    try {
+      const res = await api.get('/api/resources');
+      if (res.data.success) {
+        setResources(res.data.data);
+        setStats(prev => ({ ...prev, totalResources: res.data.data.length }));
+      }
+    } catch {}
   };
 
   const fetchNews = async () => {
@@ -153,6 +164,19 @@ const AdminDashboard = ({ user }) => {
     }
   };
 
+  const handleDeleteResource = async (id) => {
+    if (!window.confirm('Delete this resource? This cannot be undone.')) return;
+    try {
+      await api.delete(`/api/admin/resources/${id}`);
+      setResources(prev => prev.filter(r => r._id !== id));
+      setStats(prev => ({ ...prev, totalResources: prev.totalResources - 1 }));
+      setSuccess('Resource deleted.');
+      setTimeout(() => setSuccess(''), 3000);
+    } catch {
+      setError('Failed to delete resource');
+    }
+  };
+
   const handleMakeAdmin = async (userId) => {
     try {
       const response = await api.post(`/api/admin/make-admin/${userId}`, {});
@@ -163,6 +187,20 @@ const AdminDashboard = ({ user }) => {
       }
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to make admin');
+    }
+  };
+
+  const handleRemoveAdmin = async (userId) => {
+    if (!window.confirm('Remove admin role from this user?')) return;
+    try {
+      const response = await api.post(`/api/admin/remove-admin/${userId}`, {});
+      if (response.data.success) {
+        setSuccess('Admin role removed.');
+        setUsers(users.map(u => u._id === userId ? { ...u, role: 'student' } : u));
+        setTimeout(() => setSuccess(''), 3000);
+      }
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to remove admin');
     }
   };
 
@@ -323,6 +361,7 @@ const AdminDashboard = ({ user }) => {
 
       {/* Upload Tab */}
       {activeTab === 'upload' && (
+        <div className="space-y-8">
         <div className="bg-white rounded-lg shadow-md p-8 max-w-2xl">
           <h2 className="text-2xl font-bold text-gray-900 mb-6">Upload Resource</h2>
           <form onSubmit={handleUpload} className="space-y-6">
@@ -376,6 +415,31 @@ const AdminDashboard = ({ user }) => {
               {loading ? 'Uploading...' : 'Upload Resource'}
             </button>
           </form>
+        </div>
+
+        <div className="bg-white rounded-lg shadow-md p-8">
+          <h2 className="text-xl font-bold text-gray-900 mb-4">Uploaded Resources ({resources.length})</h2>
+          {resources.length === 0 ? (
+            <p className="text-gray-500 text-sm">No resources uploaded yet.</p>
+          ) : (
+            <div className="space-y-3">
+              {resources.map((r) => (
+                <div key={r._id} className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50">
+                  <div className="flex-1 min-w-0">
+                    <p className="font-semibold text-gray-900 truncate">{r.title}</p>
+                    <p className="text-xs text-gray-500 mt-0.5">
+                      Level {r.level} &middot; {r.section} &middot; {r.fileType.toUpperCase()}
+                    </p>
+                  </div>
+                  <button onClick={() => handleDeleteResource(r._id)}
+                    className="ml-4 px-3 py-1 text-red-600 hover:bg-red-50 rounded text-sm font-semibold transition flex-shrink-0">
+                    Delete
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
         </div>
       )}
 
@@ -452,10 +516,15 @@ const AdminDashboard = ({ user }) => {
                       </span>
                     </td>
                     <td className="px-6 py-3 text-sm">
-                      {userItem.role !== 'admin' && (
+                      {userItem.role !== 'admin' ? (
                         <button onClick={() => handleMakeAdmin(userItem._id)}
                           className="px-3 py-1 text-red-900 hover:bg-red-50 rounded font-semibold text-sm transition">
                           Make Admin
+                        </button>
+                      ) : userItem._id !== user?._id && (
+                        <button onClick={() => handleRemoveAdmin(userItem._id)}
+                          className="px-3 py-1 text-gray-600 hover:bg-gray-100 rounded font-semibold text-sm transition">
+                          Remove Admin
                         </button>
                       )}
                     </td>
