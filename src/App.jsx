@@ -39,6 +39,12 @@ function App() {
     setShowRegister(false);
   };
 
+  const handleUserUpdate = (updatedUser) => {
+    const merged = { ...user, ...updatedUser };
+    setUser(merged);
+    localStorage.setItem('user', JSON.stringify(merged));
+  };
+
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
@@ -156,7 +162,7 @@ function App() {
                 <Route path="/admin-dashboard" element={<AdminDashboard user={user} />} />
               )}
               <Route path="/admin" element={<AdminDashboard user={user} />} />
-              <Route path="/dashboard" element={<DashboardPage user={user} />} />
+              <Route path="/dashboard" element={<DashboardPage user={user} onUserUpdate={handleUserUpdate} />} />
               <Route path="/resources" element={<AcademicResourcesPage />} />
               <Route path="/community" element={<CommunityForumPage user={user} />} />
             </>

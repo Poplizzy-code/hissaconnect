@@ -54,6 +54,9 @@ const CommunityForumPage = ({ user }) => {
   const [selectedMembers, setSelectedMembers] = useState([]);
   const [pendingRecipient, setPendingRecipient] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [peopleList, setPeopleList] = useState([]);
+  const [peopleSearch, setPeopleSearch] = useState('');
+  const [peopleLoading, setPeopleLoading] = useState(false);
   const messagesEndRef = useRef(null);
   const typingTimeoutRef = useRef(null);
   const token = localStorage.getItem('token');
@@ -125,6 +128,30 @@ const CommunityForumPage = ({ user }) => {
     });
   }, [socket, activeConv]);
 
+  const loadPeople = useCallback(async (search = '') => {
+    setPeopleLoading(true);
+    try {
+      const res = await api.get(`/api/messages/all-users${search ? `?search=${encodeURIComponent(search)}` : ''}`);
+      if (res.data.success) setPeopleList(res.data.data);
+    } catch {} finally {
+      setPeopleLoading(false);
+    }
+  }, []);
+
+  const handleConnect = async (targetId) => {
+    try {
+      await api.post(`/api/messages/add-friend/${targetId}`);
+      setPeopleList(prev => prev.map(u => u._id === targetId ? { ...u, isFriend: true } : u));
+    } catch {}
+  };
+
+  const handleDisconnect = async (targetId) => {
+    try {
+      await api.delete(`/api/messages/remove-friend/${targetId}`);
+      setPeopleList(prev => prev.map(u => u._id === targetId ? { ...u, isFriend: false } : u));
+    } catch {}
+  };
+
   const loadConversations = useCallback(async () => {
     try {
       const res = await api.get('/api/messages/conversations');
@@ -143,6 +170,10 @@ const CommunityForumPage = ({ user }) => {
     loadConversations();
     loadGroups();
   }, [loadConversations, loadGroups]);
+
+  useEffect(() => {
+    if (activeTab === 'people' && peopleList.length === 0) loadPeople();
+  }, [activeTab]);
 
   const openConversation = async (conv) => {
     setActiveConv(conv);
@@ -331,20 +362,87 @@ const CommunityForumPage = ({ user }) => {
         <div className="flex border-b border-gray-200">
           <button
             onClick={() => setActiveTab('messages')}
-            className={`flex-1 py-2.5 text-sm font-semibold transition-colors ${activeTab === 'messages' ? 'text-red-900 border-b-2 border-red-900' : 'text-gray-500 hover:text-red-900'}`}
+            className={`flex-1 py-2.5 text-xs font-semibold transition-colors ${activeTab === 'messages' ? 'text-red-900 border-b-2 border-red-900' : 'text-gray-500 hover:text-red-900'}`}
           >
             Messages
           </button>
           <button
             onClick={() => setActiveTab('groups')}
-            className={`flex-1 py-2.5 text-sm font-semibold transition-colors ${activeTab === 'groups' ? 'text-red-900 border-b-2 border-red-900' : 'text-gray-500 hover:text-red-900'}`}
+            className={`flex-1 py-2.5 text-xs font-semibold transition-colors ${activeTab === 'groups' ? 'text-red-900 border-b-2 border-red-900' : 'text-gray-500 hover:text-red-900'}`}
           >
             Groups
           </button>
+          <button
+            onClick={() => setActiveTab('people')}
+            className={`flex-1 py-2.5 text-xs font-semibold transition-colors ${activeTab === 'people' ? 'text-red-900 border-b-2 border-red-900' : 'text-gray-500 hover:text-red-900'}`}
+          >
+            People
+          </button>
         </div>
 
+        {/* People list */}
+        {activeTab === 'people' && (
+          <div className="flex-1 overflow-y-auto flex flex-col">
+            <div className="px-3 py-2 border-b border-gray-100">
+              <input
+                type="text"
+                value={peopleSearch}
+                onChange={(e) => { setPeopleSearch(e.target.value); loadPeople(e.target.value); }}
+                placeholder="Search classmates..."
+                className="w-full px-3 py-1.5 bg-gray-100 rounded-full text-sm focus:outline-none focus:ring-1 focus:ring-red-300"
+              />
+            </div>
+            {peopleLoading ? (
+              <div className="flex justify-center items-center flex-1">
+                <div className="w-6 h-6 border-4 border-red-900 border-t-transparent rounded-full animate-spin" />
+              </div>
+            ) : peopleList.length === 0 ? (
+              <div className="flex flex-col items-center justify-center flex-1 text-gray-400 px-4 text-center">
+                <p className="text-3xl mb-2">👥</p>
+                <p className="text-sm">No classmates found</p>
+              </div>
+            ) : (
+              peopleList.map((u) => (
+                <div key={u._id} className="flex items-center gap-2 px-3 py-2.5 border-b border-gray-100 hover:bg-gray-50">
+                  <Avatar firstName={u.firstName} lastName={u.lastName} size="md" photo={u.profilePhoto} />
+                  <div className="flex-1 min-w-0">
+                    <p className="font-semibold text-gray-900 text-sm truncate">{u.firstName} {u.lastName}</p>
+                    <p className="text-xs text-gray-500">Level {u.currentLevel}</p>
+                  </div>
+                  <div className="flex gap-1 flex-shrink-0">
+                    <button
+                      onClick={() => { startDmWithUser(u); setActiveTab('messages'); }}
+                      title="Message"
+                      className="p-1.5 text-gray-500 hover:text-red-900 hover:bg-red-50 rounded-full transition"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                      </svg>
+                    </button>
+                    <button
+                      onClick={() => u.isFriend ? handleDisconnect(u._id) : handleConnect(u._id)}
+                      title={u.isFriend ? 'Disconnect' : 'Connect'}
+                      className={`p-1.5 rounded-full transition ${u.isFriend ? 'text-green-600 hover:text-red-600 hover:bg-red-50' : 'text-gray-500 hover:text-red-900 hover:bg-red-50'}`}
+                    >
+                      {u.isFriend ? (
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                        </svg>
+                      ) : (
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+                        </svg>
+                      )}
+                    </button>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        )}
+
         {/* Conversation list */}
-        <div className="flex-1 overflow-y-auto">
+        {activeTab !== 'people' && <div className="flex-1 overflow-y-auto">
           {filteredList.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full text-gray-400 px-6 text-center">
               <p className="text-3xl mb-2">{activeTab === 'messages' ? '💬' : '👥'}</p>
@@ -391,7 +489,7 @@ const CommunityForumPage = ({ user }) => {
               );
             })
           )}
-        </div>
+        </div>}
       </div>
 
       {/* Chat area */}

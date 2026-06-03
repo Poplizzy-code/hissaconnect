@@ -20,12 +20,13 @@ const AdminDashboard = ({ user }) => {
   const [newsList, setNewsList] = useState([]);
   const [users, setUsers] = useState([]);
   const [resources, setResources] = useState([]);
+  const [researchItems, setResearchItems] = useState([]);
   const [stats, setStats] = useState({ totalUsers: 0, totalResources: 0, adminUsers: 0 });
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => { fetchUsers(); fetchNews(); fetchResources(); }, []);
+  useEffect(() => { fetchUsers(); fetchNews(); fetchResources(); fetchResearchItems(); }, []);
 
   const fetchUsers = async () => {
     try {
@@ -42,6 +43,13 @@ const AdminDashboard = ({ user }) => {
     } catch (err) {
       setError('Failed to fetch users');
     }
+  };
+
+  const fetchResearchItems = async () => {
+    try {
+      const res = await api.get('/api/admin/research');
+      if (res.data.success) setResearchItems(res.data.data);
+    } catch {}
   };
 
   const fetchResources = async () => {
@@ -120,6 +128,7 @@ const AdminDashboard = ({ user }) => {
       if (response.data.success) {
         setSuccess('Opportunity added successfully!');
         setResearchData({ title: '', description: '', category: 'scholarships', link: '' });
+        fetchResearchItems();
         setTimeout(() => setSuccess(''), 3000);
       }
     } catch (err) {
@@ -161,6 +170,18 @@ const AdminDashboard = ({ user }) => {
       setError(err.response?.data?.message || 'Upload failed');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleDeleteResearch = async (id) => {
+    if (!window.confirm('Delete this opportunity?')) return;
+    try {
+      await api.delete(`/api/admin/research/${id}`);
+      setResearchItems(prev => prev.filter(r => r._id !== id));
+      setSuccess('Opportunity deleted.');
+      setTimeout(() => setSuccess(''), 3000);
+    } catch {
+      setError('Failed to delete opportunity');
     }
   };
 
@@ -445,6 +466,7 @@ const AdminDashboard = ({ user }) => {
 
       {/* Research & Opportunities Tab */}
       {activeTab === 'research' && (
+        <div className="space-y-8">
         <div className="bg-white rounded-lg shadow-md p-8 max-w-2xl">
           <h2 className="text-2xl font-bold text-gray-900 mb-2">Add Research & Opportunity</h2>
           <p className="text-gray-500 text-sm mb-6">Add a link to an external article or opportunity page</p>
@@ -485,6 +507,29 @@ const AdminDashboard = ({ user }) => {
               {loading ? 'Adding...' : 'Add Opportunity'}
             </button>
           </form>
+        </div>
+
+        <div className="bg-white rounded-lg shadow-md p-8">
+          <h2 className="text-xl font-bold text-gray-900 mb-4">Posted Opportunities ({researchItems.length})</h2>
+          {researchItems.length === 0 ? (
+            <p className="text-gray-500 text-sm">No opportunities posted yet.</p>
+          ) : (
+            <div className="space-y-3">
+              {researchItems.map((item) => (
+                <div key={item._id} className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50">
+                  <div className="flex-1 min-w-0">
+                    <p className="font-semibold text-gray-900 truncate">{item.title}</p>
+                    <p className="text-xs text-gray-500 mt-0.5 capitalize">{item.category} &middot; <a href={item.link} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">View Link</a></p>
+                  </div>
+                  <button onClick={() => handleDeleteResearch(item._id)}
+                    className="ml-4 px-3 py-1 text-red-600 hover:bg-red-50 rounded text-sm font-semibold transition flex-shrink-0">
+                    Delete
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
         </div>
       )}
 
