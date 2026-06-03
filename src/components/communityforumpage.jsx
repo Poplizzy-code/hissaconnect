@@ -433,7 +433,7 @@ const CommunityForumPage = ({ user }) => {
       {/* ── Permanent top bar with back button — always visible ── */}
       <div className="flex-shrink-0 bg-white border-b border-gray-200 px-4 py-2.5 flex items-center gap-3 shadow-sm z-20">
         <button
-          onClick={() => navigate(-1)}
+          onClick={() => navigate('/')}
           className="flex items-center gap-1.5 text-red-900 font-semibold text-sm px-3 py-1.5 rounded-lg hover:bg-red-50 active:bg-red-100 transition border border-red-200"
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -553,7 +553,7 @@ const CommunityForumPage = ({ user }) => {
 
         {/* ← Back button — always visible in sidebar, every tab */}
         <button
-          onClick={() => navigate(-1)}
+          onClick={() => navigate('/')}
           className="flex items-center gap-2 w-full px-4 py-3 bg-red-50 border-b-2 border-red-200 text-red-900 font-bold text-sm hover:bg-red-100 active:bg-red-200 transition flex-shrink-0"
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -683,7 +683,7 @@ const CommunityForumPage = ({ user }) => {
       {activeConv ? (
         <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
           {/* Chat header */}
-          <div className="bg-white border-b border-gray-200 px-3 md:px-4 py-3 flex items-center gap-2 md:gap-3 shadow-sm flex-shrink-0">
+          <div className="bg-white border-b border-gray-200 px-3 md:px-4 py-3 flex items-center gap-2 md:gap-3 shadow-sm flex-shrink-0 overflow-hidden">
             {/* Back button — all screens */}
             <button
               onClick={() => { setActiveConv(null); setMobileView('sidebar'); }}
@@ -735,7 +735,7 @@ const CommunityForumPage = ({ user }) => {
           )}
 
           {/* Messages */}
-          <div className="flex-1 min-h-0 overflow-y-auto p-3 md:p-4 space-y-1"
+          <div className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden p-3 md:p-4 space-y-1"
             style={{ backgroundImage: 'radial-gradient(circle, #e5e5e5 1px, transparent 1px)', backgroundSize: '20px 20px', backgroundColor: '#f0f0f0' }}>
             {loading ? (
               <div className="flex justify-center items-center h-full">
@@ -760,13 +760,13 @@ const CommunityForumPage = ({ user }) => {
                 const isOwn = senderId === user?.id || senderId?.toString() === user?.id;
                 const senderName = item.sender?.firstName ? `${item.sender.firstName} ${item.sender.lastName}` : item.sender?.fullName || '';
                 return (
-                  <div key={item._id || idx} className={`flex ${isOwn ? 'justify-end' : 'justify-start'} mb-1`}>
-                    <div className="max-w-[80%] md:max-w-[65%]">
+                  <div key={item._id || idx} className={`flex ${isOwn ? 'justify-end' : 'justify-start'} mb-1 min-w-0`}>
+                    <div className="max-w-[80%] md:max-w-[65%] min-w-0">
                       {!isOwn && activeConv.conversationType === 'group' && (
-                        <p className="text-xs text-red-700 font-semibold mb-0.5 ml-1">{senderName}</p>
+                        <p className="text-xs text-red-700 font-semibold mb-0.5 ml-1 truncate">{senderName}</p>
                       )}
                       <div className={`px-3 py-2 rounded-lg shadow-sm ${isOwn ? 'bg-red-900 text-white rounded-br-none' : 'bg-white text-gray-900 rounded-bl-none'}`}>
-                        <p className="text-sm leading-relaxed">{item.content}</p>
+                        <p className="text-sm leading-relaxed break-words whitespace-pre-wrap">{item.content}</p>
                         <p className={`text-xs mt-0.5 text-right ${isOwn ? 'text-red-200' : 'text-gray-400'}`}>{formatTime(item.timestamp)}</p>
                       </div>
                     </div>
