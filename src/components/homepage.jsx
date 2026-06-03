@@ -88,17 +88,15 @@ const HomePage = ({ onStartLearning, onExploreCourses, onOpenCommunity, isAuthen
     <div className="min-h-screen bg-white">
 
       {/* ── 1. HERO ── */}
-      {/* Hero background: lecture hall photo by Vitaly Gariev (Unsplash, free licence) */}
-      <section
-        className="relative text-white py-28 bg-red-900"
-        style={{
-          backgroundImage: 'url(https://images.unsplash.com/photo-1758270705799-12efda48d4f4?auto=format&fit=crop&w=1920&q=80)',
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-        }}
-      >
-        {/* Dark overlay so text stays readable over any image */}
-        <div className="absolute inset-0 bg-red-900 bg-opacity-80" />
+      <section className="relative text-white py-28 overflow-hidden">
+        {/* Background photo — lecture hall by Vitaly Gariev (Unsplash, free licence) */}
+        <img
+          src="https://images.unsplash.com/photo-1758270705799-12efda48d4f4?auto=format&fit=crop&w=1920&q=80"
+          alt=""
+          className="absolute inset-0 w-full h-full object-cover object-center"
+        />
+        {/* Red brand overlay */}
+        <div className="absolute inset-0 bg-red-900 bg-opacity-75" />
 
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl">
@@ -291,54 +289,54 @@ const HomePage = ({ onStartLearning, onExploreCourses, onOpenCommunity, isAuthen
       </section>
 
       {/* ── 5. ABOUT — AIM, VISION, MISSION ── */}
-      <section className="py-20 bg-gray-900 text-white">
+      <section className="py-20 bg-red-900 text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-14">
-            <p className="text-red-400 font-semibold tracking-widest uppercase text-sm mb-3">Who We Are</p>
+            <p className="text-red-300 font-semibold tracking-widest uppercase text-sm mb-3">Who We Are</p>
             <h2 className="text-4xl font-bold mb-4">The HISSA Impact Regime</h2>
-            <p className="text-gray-400 max-w-2xl mx-auto text-lg">
+            <p className="text-red-200 max-w-2xl mx-auto text-lg">
               Promoting academic excellence, student unity, leadership development, and meaningful
               engagement within the Department of History and International Studies.
             </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {/* Aim */}
-            <div className="bg-gray-800 rounded-2xl p-8 border border-gray-700 hover:border-red-700 transition">
-              <div className="w-14 h-14 bg-red-900 rounded-xl flex items-center justify-center mb-6">
-                <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="bg-red-800 rounded-2xl p-8 border border-red-700 hover:border-white transition">
+              <div className="w-14 h-14 bg-white rounded-xl flex items-center justify-center mb-6">
+                <svg className="w-7 h-7 text-red-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
                 </svg>
               </div>
               <h3 className="text-xl font-bold text-white mb-3">Our Aim</h3>
-              <p className="text-gray-400 leading-relaxed">
+              <p className="text-red-200 leading-relaxed">
                 To promote academic excellence, student unity, leadership development, and meaningful
                 engagement within the department while creating lasting impact on students and the
                 department as a whole.
               </p>
             </div>
             {/* Vision */}
-            <div className="bg-gray-800 rounded-2xl p-8 border border-gray-700 hover:border-red-700 transition">
-              <div className="w-14 h-14 bg-red-900 rounded-xl flex items-center justify-center mb-6">
-                <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="bg-red-800 rounded-2xl p-8 border border-red-700 hover:border-white transition">
+              <div className="w-14 h-14 bg-white rounded-xl flex items-center justify-center mb-6">
+                <svg className="w-7 h-7 text-red-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                 </svg>
               </div>
               <h3 className="text-xl font-bold text-white mb-3">Our Vision</h3>
-              <p className="text-gray-400 leading-relaxed">
+              <p className="text-red-200 leading-relaxed">
                 To build a united and intellectually vibrant student community driven by excellence,
                 innovation, and impact.
               </p>
             </div>
             {/* Mission */}
-            <div className="bg-gray-800 rounded-2xl p-8 border border-gray-700 hover:border-red-700 transition">
-              <div className="w-14 h-14 bg-red-900 rounded-xl flex items-center justify-center mb-6">
-                <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="bg-red-800 rounded-2xl p-8 border border-red-700 hover:border-white transition">
+              <div className="w-14 h-14 bg-white rounded-xl flex items-center justify-center mb-6">
+                <svg className="w-7 h-7 text-red-900" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                 </svg>
               </div>
               <h3 className="text-xl font-bold text-white mb-3">Our Mission</h3>
-              <p className="text-gray-400 leading-relaxed">
+              <p className="text-red-200 leading-relaxed">
                 To serve, represent, and empower History and International Studies students through
                 leadership, academic support, and impactful initiatives.
               </p>
