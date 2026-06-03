@@ -74,6 +74,8 @@ const CommunityForumPage = ({ user }) => {
   // DM friend status + message limit
   const [dmFriendStatus, setDmFriendStatus] = useState(null);
   const [messageLimitReached, setMessageLimitReached] = useState(false);
+  // Mobile view toggle
+  const [mobileView, setMobileView] = useState('sidebar'); // 'sidebar' | 'chat'
 
   const messagesEndRef = useRef(null);
   const typingTimeoutRef = useRef(null);
@@ -209,6 +211,7 @@ const CommunityForumPage = ({ user }) => {
     setActiveConv(conv);
     setPendingRecipient(null);
     setMessageLimitReached(false);
+    setMobileView('chat');
     setDmFriendStatus(null);
     setLoading(true);
     try {
@@ -242,6 +245,7 @@ const CommunityForumPage = ({ user }) => {
       setMessages([]);
       setDmFriendStatus(null);
       setMessageLimitReached(false);
+      setMobileView('chat');
     }
     setShowNewChat(false);
     setUserSearch('');
@@ -389,7 +393,7 @@ const CommunityForumPage = ({ user }) => {
   return (
     <div className="w-full h-full bg-gray-100 flex overflow-hidden">
       {/* Sidebar */}
-      <div className="w-80 bg-white flex flex-col border-r border-gray-200 flex-shrink-0">
+      <div className={`${mobileView === 'chat' ? 'hidden' : 'flex'} md:flex flex-col w-full md:w-80 lg:w-96 bg-white border-r border-gray-200 flex-shrink-0`}>
         {/* Sidebar header */}
         <div className="bg-red-900 px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-3">
@@ -608,10 +612,17 @@ const CommunityForumPage = ({ user }) => {
       </div>
 
       {/* Chat area */}
+      <div className={`${mobileView === 'sidebar' ? 'hidden' : 'flex'} md:flex flex-1 flex-col min-w-0`}>
       {activeConv ? (
-        <div className="flex-1 flex flex-col min-w-0">
+        <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
           {/* Chat header */}
-          <div className="bg-white border-b border-gray-200 px-4 py-3 flex items-center gap-3 shadow-sm">
+          <div className="bg-white border-b border-gray-200 px-3 md:px-4 py-3 flex items-center gap-2 md:gap-3 shadow-sm flex-shrink-0">
+            {/* Back button — mobile only */}
+            <button onClick={() => setMobileView('sidebar')} className="md:hidden p-2 hover:bg-gray-100 rounded-full flex-shrink-0">
+              <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+            </button>
             <div className="relative">
               {activeConv.conversationType === 'group' ? (
                 <div className="w-10 h-10 rounded-full bg-gray-400 flex items-center justify-center text-white font-bold">
@@ -643,7 +654,7 @@ const CommunityForumPage = ({ user }) => {
           )}
 
           {/* Messages */}
-          <div className="flex-1 overflow-y-auto p-4 space-y-1"
+          <div className="flex-1 overflow-y-auto p-3 md:p-4 space-y-1"
             style={{ backgroundImage: 'radial-gradient(circle, #e5e5e5 1px, transparent 1px)', backgroundSize: '20px 20px', backgroundColor: '#f0f0f0' }}>
             {loading ? (
               <div className="flex justify-center items-center h-full">
@@ -669,7 +680,7 @@ const CommunityForumPage = ({ user }) => {
                 const senderName = item.sender?.firstName ? `${item.sender.firstName} ${item.sender.lastName}` : item.sender?.fullName || '';
                 return (
                   <div key={item._id || idx} className={`flex ${isOwn ? 'justify-end' : 'justify-start'} mb-1`}>
-                    <div className={`max-w-xs lg:max-w-md xl:max-w-lg`}>
+                    <div className="max-w-[80%] md:max-w-[65%]">
                       {!isOwn && activeConv.conversationType === 'group' && (
                         <p className="text-xs text-red-700 font-semibold mb-0.5 ml-1">{senderName}</p>
                       )}
@@ -700,18 +711,18 @@ const CommunityForumPage = ({ user }) => {
           </div>
 
           {/* Input */}
-          <div className="bg-white border-t border-gray-200 px-4 py-3 flex items-end gap-3">
+          <div className="bg-white border-t border-gray-200 px-3 md:px-4 py-3 flex items-end gap-2 md:gap-3 flex-shrink-0">
             <textarea value={messageInput}
               onChange={(e) => { setMessageInput(e.target.value); handleTyping(); }}
               onKeyDown={handleKeyDown}
               placeholder={messageLimitReached ? 'Message limit reached…' : 'Type a message'}
               disabled={messageLimitReached}
               rows={1}
-              className="flex-1 resize-none px-4 py-2.5 bg-gray-100 rounded-full text-sm focus:outline-none focus:bg-white focus:ring-1 focus:ring-red-300 max-h-24 disabled:opacity-50"
-              style={{ minHeight: '40px' }}
+              className="flex-1 resize-none px-4 py-2.5 bg-gray-100 rounded-2xl text-sm focus:outline-none focus:bg-white focus:ring-2 focus:ring-red-200 max-h-32 disabled:opacity-50 leading-relaxed"
+              style={{ minHeight: '44px' }}
             />
             <button onClick={sendMessage} disabled={!messageInput.trim() || messageLimitReached}
-              className="w-10 h-10 bg-red-900 text-white rounded-full flex items-center justify-center hover:bg-red-800 transition disabled:opacity-40 flex-shrink-0">
+              className="w-11 h-11 bg-red-900 text-white rounded-full flex items-center justify-center hover:bg-red-800 active:scale-95 transition disabled:opacity-40 flex-shrink-0">
               <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
                 <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z" />
               </svg>
@@ -729,6 +740,7 @@ const CommunityForumPage = ({ user }) => {
           <p className="text-gray-500 max-w-sm">Select a conversation or tap <span className="font-semibold text-red-900">+</span> to start a new message.</p>
         </div>
       )}
+      </div>
 
       {/* New Chat Modal */}
       {showNewChat && (
