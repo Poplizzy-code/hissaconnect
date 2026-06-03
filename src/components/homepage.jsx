@@ -93,7 +93,7 @@ const HomePage = ({ onStartLearning, onExploreCourses, onOpenCommunity, isAuthen
         style={{ backgroundImage: 'url(/hissabg.jpeg)', backgroundSize: 'cover', backgroundPosition: 'center' }}
       >
         {/* Red brand overlay */}
-        <div className="absolute inset-0 bg-red-900/75" />
+        <div className="absolute inset-0 bg-red-900/30" />
 
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl">
