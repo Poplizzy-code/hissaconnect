@@ -395,15 +395,21 @@ const CommunityForumPage = ({ user }) => {
   return (
     <div className="w-full h-full bg-gray-100 flex overflow-hidden">
       {/* Sidebar */}
-      <div className={`${mobileView === 'chat' ? 'hidden' : 'flex'} md:flex flex-col w-full md:w-80 lg:w-96 bg-white border-r border-gray-200 flex-shrink-0`}>
+      <div className={`${mobileView === 'chat' ? 'hidden' : 'flex'} md:flex flex-col w-full md:w-80 lg:w-96 bg-white border-r border-gray-200 flex-shrink-0 min-h-0`}>
+        {/* Back bar */}
+        <button
+          onClick={() => navigate(-1)}
+          className="flex items-center gap-1.5 px-4 py-2 bg-white border-b border-gray-200 text-red-900 text-sm font-semibold hover:bg-red-50 transition w-full"
+        >
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+          </svg>
+          Back
+        </button>
+
         {/* Sidebar header */}
         <div className="bg-red-900 px-3 py-3 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <button onClick={() => navigate(-1)} title="Leave Community" className="p-1.5 text-red-200 hover:text-white hover:bg-red-800 rounded-full transition flex-shrink-0">
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-              </svg>
-            </button>
             <Avatar firstName={user?.firstName} lastName={user?.lastName} size="md" photo={user?.profilePhoto} />
             <span className="text-white font-bold text-base">Community</span>
           </div>
@@ -619,20 +625,20 @@ const CommunityForumPage = ({ user }) => {
       </div>
 
       {/* Chat area */}
-      <div className={`${mobileView === 'sidebar' ? 'hidden' : 'flex'} md:flex flex-1 flex-col min-w-0 overflow-hidden`}>
+      <div className={`${mobileView === 'sidebar' ? 'hidden' : 'flex'} md:flex flex-1 flex-col min-w-0 min-h-0 overflow-hidden`}>
       {activeConv ? (
-        <div className="flex-1 flex flex-col overflow-hidden">
+        <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
           {/* Chat header */}
           <div className="bg-white border-b border-gray-200 px-3 md:px-4 py-3 flex items-center gap-2 md:gap-3 shadow-sm flex-shrink-0">
             {/* Back button — all screens */}
             <button
               onClick={() => { setActiveConv(null); setMobileView('sidebar'); }}
-              className="p-2 hover:bg-gray-100 rounded-full flex-shrink-0 transition"
-              title="Back"
+              className="flex items-center gap-1 px-2 py-1.5 hover:bg-gray-100 rounded-lg flex-shrink-0 transition text-gray-600 hover:text-gray-900"
             >
-              <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
               </svg>
+              <span className="text-sm font-semibold">Back</span>
             </button>
             <div className="relative flex-shrink-0">
               {activeConv.conversationType === 'group' ? (
@@ -672,7 +678,7 @@ const CommunityForumPage = ({ user }) => {
           )}
 
           {/* Messages */}
-          <div className="flex-1 overflow-y-auto p-3 md:p-4 space-y-1"
+          <div className="flex-1 min-h-0 overflow-y-auto p-3 md:p-4 space-y-1"
             style={{ backgroundImage: 'radial-gradient(circle, #e5e5e5 1px, transparent 1px)', backgroundSize: '20px 20px', backgroundColor: '#f0f0f0' }}>
             {loading ? (
               <div className="flex justify-center items-center h-full">

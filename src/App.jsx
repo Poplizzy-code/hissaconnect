@@ -164,7 +164,11 @@ function App() {
               <Route path="/admin" element={<AdminDashboard user={user} />} />
               <Route path="/dashboard" element={<DashboardPage user={user} onUserUpdate={handleUserUpdate} />} />
               <Route path="/resources" element={<AcademicResourcesPage />} />
-              <Route path="/community" element={<CommunityForumPage user={user} />} />
+              <Route path="/community" element={
+                <div className="fixed inset-0 top-16 bg-white z-10">
+                  <CommunityForumPage user={user} />
+                </div>
+              } />
             </>
           ) : (
             <>
