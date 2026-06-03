@@ -44,8 +44,9 @@ const Toast = ({ toast }) => {
   );
 };
 
-const CommunityForumPage = ({ user }) => {
+const CommunityForumPage = ({ user, onClose }) => {
   const navigate = useNavigate();
+  const goBack = () => { if (onClose) onClose(); else navigate('/'); };
   const [socket, setSocket] = useState(null);
   const [activeTab, setActiveTab] = useState('messages');
   const [conversations, setConversations] = useState([]);
@@ -433,7 +434,7 @@ const CommunityForumPage = ({ user }) => {
       {/* ── Permanent top bar with back button — always visible ── */}
       <div className="flex-shrink-0 bg-white border-b border-gray-200 px-4 py-2.5 flex items-center gap-3 shadow-sm z-20">
         <button
-          onClick={() => navigate('/')}
+          onClick={goBack}
           className="flex items-center gap-1.5 text-red-900 font-semibold text-sm px-3 py-1.5 rounded-lg hover:bg-red-50 active:bg-red-100 transition border border-red-200"
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -553,7 +554,7 @@ const CommunityForumPage = ({ user }) => {
 
         {/* ← Back button — always visible in sidebar, every tab */}
         <button
-          onClick={() => navigate('/')}
+          onClick={goBack}
           className="flex items-center gap-2 w-full px-4 py-3 bg-red-50 border-b-2 border-red-200 text-red-900 font-bold text-sm hover:bg-red-100 active:bg-red-200 transition flex-shrink-0"
         >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
