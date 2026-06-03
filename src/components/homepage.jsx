@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import axios from 'axios';
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+import api from '../utils/api';
 
 const categoryColors = {
   scholarships: 'green',
@@ -51,9 +49,9 @@ const HomePage = ({ onStartLearning, onExploreCourses, onOpenCommunity, isAuthen
 
         const [resourcesRes, researchRes] = await Promise.all([
           token
-            ? axios.get(`${API_URL}/api/resources`, { headers: { Authorization: `Bearer ${token}` } })
+            ? api.get('/api/resources')
             : Promise.resolve({ data: { success: false, data: [] } }),
-          axios.get(`${API_URL}/api/admin/research`),
+          api.get('/api/admin/research'),
         ]);
 
         if (resourcesRes.data.success) {

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import api from '../utils/api';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
@@ -24,15 +24,11 @@ const AdminDashboard = ({ user }) => {
   const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const token = localStorage.getItem('token');
-
   useEffect(() => { fetchUsers(); fetchNews(); }, []);
 
   const fetchUsers = async () => {
     try {
-      const response = await axios.get(`${API_URL}/api/admin/users`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const response = await api.get('/api/admin/users');
       if (response.data.success) {
         const allUsers = response.data.data;
         setUsers(allUsers);
@@ -49,7 +45,7 @@ const AdminDashboard = ({ user }) => {
 
   const fetchNews = async () => {
     try {
-      const res = await axios.get(`${API_URL}/api/news`);
+      const res = await api.get('/api/news');
       if (res.data.success) setNewsList(res.data.data);
     } catch {}
   };
@@ -72,9 +68,7 @@ const AdminDashboard = ({ user }) => {
     newsVideos.forEach(f => formData.append('videos', f));
     newsFiles.forEach(f => formData.append('files', f));
     try {
-      const res = await axios.post(`${API_URL}/api/news`, formData, {
-        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'multipart/form-data' },
-      });
+      const res = await api.post('/api/news', formData);
       if (res.data.success) {
         setSuccess('News post published!');
         setNewsData({ title: '', content: '', category: 'general', youtubeUrl: '' });
@@ -94,9 +88,7 @@ const AdminDashboard = ({ user }) => {
   const handleDeleteNews = async (id) => {
     if (!window.confirm('Delete this news post?')) return;
     try {
-      await axios.delete(`${API_URL}/api/news/${id}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      await api.delete(`/api/news/${id}`);
       setNewsList(prev => prev.filter(n => n._id !== id));
     } catch {
       setError('Failed to delete news');
@@ -113,9 +105,7 @@ const AdminDashboard = ({ user }) => {
     setLoading(true);
     setError('');
     try {
-      const response = await axios.post(`${API_URL}/api/admin/research`, researchData, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const response = await api.post('/api/admin/research', researchData);
       if (response.data.success) {
         setSuccess('Opportunity added successfully!');
         setResearchData({ title: '', description: '', category: 'scholarships', link: '' });
@@ -150,9 +140,7 @@ const AdminDashboard = ({ user }) => {
     formData.append('file', uploadData.file);
     formData.append('fileType', uploadData.fileType);
     try {
-      const response = await axios.post(`${API_URL}/api/admin/upload-resource`, formData, {
-        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'multipart/form-data' }
-      });
+      const response = await api.post('/api/admin/upload-resource', formData);
       if (response.data.success) {
         setSuccess('Resource uploaded successfully!');
         setUploadData({ title: '', description: '', level: '100', section: 'academic', file: null, fileType: 'pdf' });
@@ -167,10 +155,7 @@ const AdminDashboard = ({ user }) => {
 
   const handleMakeAdmin = async (userId) => {
     try {
-      const response = await axios.post(
-        `${API_URL}/api/admin/make-admin/${userId}`, {},
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      const response = await api.post(`/api/admin/make-admin/${userId}`, {});
       if (response.data.success) {
         setSuccess('User promoted to admin!');
         setUsers(users.map(u => u._id === userId ? { ...u, role: 'admin' } : u));

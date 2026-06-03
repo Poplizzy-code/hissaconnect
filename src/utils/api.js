@@ -1,4 +1,29 @@
+import axios from 'axios';
+
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
+// Axios instance that auto-attaches token and handles 401 globally
+const api = axios.create({ baseURL: API_URL });
+
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem('token');
+  if (token) config.headers.Authorization = `Bearer ${token}`;
+  return config;
+});
+
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      window.location.href = '/';
+    }
+    return Promise.reject(error);
+  }
+);
+
+export default api;
 
 export const registerUser = async (userData) => {
   try {
@@ -11,23 +36,6 @@ export const registerUser = async (userData) => {
     if (!response.ok) throw new Error(data.message || 'Registration failed');
     return data;
   } catch (error) {
-    console.error('Registration error:', error);
-    throw error;
-  }
-};
-
-export const verifyEmail = async (email, code) => {
-  try {
-    const response = await fetch(`${API_URL}/api/auth/verify-email`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, code }),
-    });
-    const data = await response.json();
-    if (!response.ok) throw new Error(data.message || 'Verification failed');
-    return data;
-  } catch (error) {
-    console.error('Verification error:', error);
     throw error;
   }
 };
@@ -40,26 +48,9 @@ export const loginUser = async (email, password) => {
       body: JSON.stringify({ email, password }),
     });
     const data = await response.json();
-    if (!response.ok) {
-      console.error('Server error response:', data);
-      throw new Error(data.message || 'Login failed');
-    }
+    if (!response.ok) throw new Error(data.message || 'Login failed');
     return data;
   } catch (error) {
-    console.error('Login error:', error);
-    throw error;
-  }
-};
-
-export const fetchUserData = async (token) => {
-  try {
-    const response = await fetch(`${API_URL}/api/user`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    if (!response.ok) throw new Error('Failed to fetch user');
-    return await response.json();
-  } catch (error) {
-    console.error('Fetch user error:', error);
     throw error;
   }
 };

@@ -1,8 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+import api from '../utils/api';
 
 const AcademicResourcesPage = () => {
   const [step, setStep] = useState(1);
@@ -35,11 +33,7 @@ const AcademicResourcesPage = () => {
     setError('');
 
     try {
-      const token = localStorage.getItem('token');
-      const response = await axios.get(
-        `${API_URL}/api/resources/academic/${level}`,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      const response = await api.get(`/api/resources/academic/${level}`);
 
       if (response.data.success) {
         setResources(response.data.data || []);

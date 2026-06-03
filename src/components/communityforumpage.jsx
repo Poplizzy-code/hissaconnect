@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { io } from 'socket.io-client';
-import axios from 'axios';
+import api from '../utils/api';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 const SOCKET_URL = API_URL;
@@ -59,6 +59,7 @@ const CommunityForumPage = ({ user }) => {
   const token = localStorage.getItem('token');
 
   // Scroll to bottom of messages
+
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
@@ -126,21 +127,17 @@ const CommunityForumPage = ({ user }) => {
 
   const loadConversations = useCallback(async () => {
     try {
-      const res = await axios.get(`${API_URL}/api/messages/conversations`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const res = await api.get('/api/messages/conversations');
       if (res.data.success) setConversations(res.data.data);
     } catch {}
-  }, [token]);
+  }, []);
 
   const loadGroups = useCallback(async () => {
     try {
-      const res = await axios.get(`${API_URL}/api/messages/groups`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const res = await api.get('/api/messages/groups');
       if (res.data.success) setGroups(res.data.data);
     } catch {}
-  }, [token]);
+  }, []);
 
   useEffect(() => {
     loadConversations();
@@ -152,9 +149,7 @@ const CommunityForumPage = ({ user }) => {
     setPendingRecipient(null);
     setLoading(true);
     try {
-      const res = await axios.get(`${API_URL}/api/messages/conversation/${conv._id}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const res = await api.get(`/api/messages/conversation/${conv._id}`);
       if (res.data.success) setMessages(res.data.data.messages || []);
     } catch {
       setMessages([]);
@@ -216,9 +211,7 @@ const CommunityForumPage = ({ user }) => {
     setUserSearch(q);
     if (!q.trim()) { setUserResults([]); return; }
     try {
-      const res = await axios.get(`${API_URL}/api/messages/users?search=${q}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const res = await api.get(`/api/messages/users?search=${q}`);
       if (res.data.success) setUserResults(res.data.data);
     } catch {}
   };
@@ -226,11 +219,9 @@ const CommunityForumPage = ({ user }) => {
   const handleCreateGroup = async () => {
     if (!groupName.trim()) return;
     try {
-      const res = await axios.post(
-        `${API_URL}/api/messages/groups`,
-        { name: groupName, memberIds: selectedMembers.map((m) => m._id) },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      const res = await api.post('/api/messages/groups', {
+        name: groupName, memberIds: selectedMembers.map((m) => m._id),
+      });
       if (res.data.success) {
         loadGroups();
         setShowNewGroup(false);
