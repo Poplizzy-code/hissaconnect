@@ -64,7 +64,7 @@ const RegisterPage = ({ onLogin }) => {
 
   return (
     <div className="min-h-screen bg-red-900 flex items-center justify-center p-6">
-      <div className="w-full max-w-6xl grid grid-cols-1 md:grid-cols-2 rounded-2xl overflow-hidden shadow-2xl">
+      <div className="hc-page-enter w-full max-w-6xl grid grid-cols-1 md:grid-cols-2 rounded-2xl overflow-hidden shadow-2xl">
 
         {/* Left Panel */}
         <div className="hidden md:flex flex-col justify-between bg-gradient-to-br from-red-800 via-red-900 to-black p-10 text-white">

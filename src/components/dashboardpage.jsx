@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import api from '../utils/api';
 
@@ -63,6 +63,22 @@ const DashboardPage = ({ user, onUserUpdate }) => {
 
   const avatarSrc = user?.profilePhoto;
 
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+            observer.unobserve(entry.target);
+          }
+        });
+      },
+      { threshold: 0.06 }
+    );
+    document.querySelectorAll('.hc-reveal, .hc-reveal-scale').forEach((el) => observer.observe(el));
+    return () => observer.disconnect();
+  }, []);
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       <button onClick={() => navigate(-1)} className="flex items-center gap-1.5 text-red-900 hover:text-red-700 text-sm font-semibold mb-6 transition">
@@ -85,18 +101,20 @@ const DashboardPage = ({ user, onUserUpdate }) => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2 space-y-8">
           <div className="grid grid-cols-3 gap-4">
-            <div className="bg-white rounded-lg shadow-md p-6 text-center">
-              <p className="text-3xl font-bold text-red-900 mb-2">0</p>
-              <p className="text-sm text-gray-600">Courses Enrolled</p>
-            </div>
-            <div className="bg-white rounded-lg shadow-md p-6 text-center">
-              <p className="text-3xl font-bold text-red-900 mb-2">0</p>
-              <p className="text-sm text-gray-600">Study Hours</p>
-            </div>
-            <div className="bg-white rounded-lg shadow-md p-6 text-center">
-              <p className="text-3xl font-bold text-red-900 mb-2">0</p>
-              <p className="text-sm text-gray-600">Resources</p>
-            </div>
+            {[
+              { val: '0', label: 'Courses Enrolled' },
+              { val: '0', label: 'Study Hours' },
+              { val: '0', label: 'Resources' },
+            ].map((stat, i) => (
+              <div
+                key={stat.label}
+                className="hc-reveal bg-white rounded-lg shadow-md p-6 text-center hover:shadow-lg transition-shadow duration-200"
+                style={{ transitionDelay: `${i * 0.1}s` }}
+              >
+                <p className="text-3xl font-extrabold text-red-900 mb-2">{stat.val}</p>
+                <p className="text-sm text-gray-600">{stat.label}</p>
+              </div>
+            ))}
           </div>
 
           <div>

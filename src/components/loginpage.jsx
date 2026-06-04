@@ -56,13 +56,14 @@ const LoginPage = ({ onLogin }) => {
 
   return (
     <div className="min-h-screen bg-red-900 flex items-center justify-center p-6">
-      <div className="w-full max-w-6xl grid grid-cols-1 md:grid-cols-2 rounded-2xl overflow-hidden shadow-2xl bg-white">
+      <div className="hc-page-enter w-full max-w-6xl grid grid-cols-1 md:grid-cols-2 rounded-2xl overflow-hidden shadow-2xl bg-white">
         {/* LEFT IMAGE PANEL */}
         <div className="hidden md:block relative">
           <img
             src={historyImage}
             alt="History resources"
             className="w-full h-full object-cover"
+            loading="lazy"
           />
           <div className="absolute inset-0 bg-gradient-to-br from-black/70 via-red-900/40 to-transparent p-8 flex flex-col justify-between text-white">
             <div className="text-xl font-semibold tracking-wide">
